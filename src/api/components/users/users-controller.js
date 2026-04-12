@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const usersService = require('./users-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 const { hashPassword } = require('../../../utils/password');
@@ -31,7 +33,7 @@ async function createUser(request, response, next) {
     const {
       email,
       password,
-      full_name: fullName,
+      username,
       confirm_password: confirmPassword,
     } = request.body;
 
@@ -41,11 +43,8 @@ async function createUser(request, response, next) {
     }
 
     // Full name is required and cannot be empty
-    if (!fullName) {
-      throw errorResponder(
-        errorTypes.VALIDATION_ERROR,
-        'Full name is required'
-      );
+    if (!username) {
+      throw errorResponder(errorTypes.VALIDATION_ERROR, 'Username is required');
     }
 
     // Email must be unique
@@ -79,7 +78,7 @@ async function createUser(request, response, next) {
     const success = await usersService.createUser(
       email,
       hashedPassword,
-      fullName
+      username
     );
 
     if (!success) {
@@ -97,7 +96,7 @@ async function createUser(request, response, next) {
 
 async function updateUser(request, response, next) {
   try {
-    const { email, full_name: fullName } = request.body;
+    const { email, username } = request.body;
 
     // User must exist
     const user = await usersService.getUser(request.params.id);
@@ -111,11 +110,8 @@ async function updateUser(request, response, next) {
     }
 
     // Full name is required and cannot be empty
-    if (!fullName) {
-      throw errorResponder(
-        errorTypes.VALIDATION_ERROR,
-        'Full name is required'
-      );
+    if (!username) {
+      throw errorResponder(errorTypes.VALIDATION_ERROR, 'Username is required');
     }
 
     // Email must be unique, if it is changed
@@ -129,7 +125,7 @@ async function updateUser(request, response, next) {
     const success = await usersService.updateUser(
       request.params.id,
       email,
-      fullName
+      username
     );
 
     if (!success) {
@@ -191,6 +187,57 @@ async function deleteUser(request, response, next) {
   }
 }
 
+async function login(request, response, next) {
+  try {
+    const { email, password } = request.body;
+
+    // validasi input
+    if (!email || !password) {
+      throw errorResponder(
+        errorTypes.VALIDATION_ERROR,
+        'Email and password are required'
+      );
+    }
+
+    // ambil user dari DB (INI YANG BENAR)
+    const user = await usersService.getUserByEmail(email);
+
+    if (!user) {
+      throw errorResponder(
+        errorTypes.UNAUTHORIZED,
+        'Invalid email or password'
+      );
+    }
+
+    // cek password
+    const isValid = await bcrypt.compare(password, user.password);
+
+    if (!isValid) {
+      throw errorResponder(
+        errorTypes.UNAUTHORIZED,
+        'Invalid email or password'
+      );
+    }
+
+    // buat token
+    const token = jwt.sign(
+      {
+        id: user._id,
+        username: user.username,
+      },
+      'secretkey',
+      { expiresIn: '1d' }
+    );
+
+    return response.status(200).json({
+      message: 'Login success',
+      token,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -198,4 +245,5 @@ module.exports = {
   updateUser,
   changePassword,
   deleteUser,
+  login,
 };
