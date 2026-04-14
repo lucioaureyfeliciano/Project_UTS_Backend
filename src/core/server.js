@@ -10,6 +10,9 @@ const { errorResponder, errorTypes } = require('./errors');
 
 const app = express();
 
+const trackUsage = require('./middlewares/trackUsage.middleware');
+app.use(trackUsage);
+
 // Useful if behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc).
 // It shows the real origin IP in the Heroku or Cloudwatch logs.
 app.enable('trust proxy');
