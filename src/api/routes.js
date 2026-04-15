@@ -1,13 +1,17 @@
-const express = require('express');
+const express = require("express");
 
-const books = require('./components/books/books-route');
-const users = require('./components/users/users-route');
+const users = require("./components/users/users-route");
+const comments = require("./components/comments/comments-route.js");
+const bookmarks = require("./components/bookmarks/bookmarks-route.js");
+const notifications = require("./components/notifications/notifications-route.js");
 
 module.exports = () => {
   const app = express.Router();
 
-  books(app);
   users(app);
+  comments(app);
+  notifications(app);
+  bookmarks(app);
 
   return app;
 };
