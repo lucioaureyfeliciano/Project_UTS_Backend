@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const usersService = require('./users-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 const { hashPassword } = require('../../../utils/password');
@@ -31,7 +33,7 @@ async function createUser(request, response, next) {
     const {
       email,
       password,
-      full_name: fullName,
+      username,
       confirm_password: confirmPassword,
     } = request.body;
 
@@ -41,11 +43,8 @@ async function createUser(request, response, next) {
     }
 
     // Full name is required and cannot be empty
-    if (!fullName) {
-      throw errorResponder(
-        errorTypes.VALIDATION_ERROR,
-        'Full name is required'
-      );
+    if (!username) {
+      throw errorResponder(errorTypes.VALIDATION_ERROR, 'Username is required');
     }
 
     // Email must be unique
@@ -79,7 +78,7 @@ async function createUser(request, response, next) {
     const success = await usersService.createUser(
       email,
       hashedPassword,
-      fullName
+      username
     );
 
     if (!success) {
@@ -97,7 +96,7 @@ async function createUser(request, response, next) {
 
 async function updateUser(request, response, next) {
   try {
-    const { email, full_name: fullName } = request.body;
+    const { email, username } = request.body;
 
     // User must exist
     const user = await usersService.getUser(request.params.id);
@@ -111,11 +110,8 @@ async function updateUser(request, response, next) {
     }
 
     // Full name is required and cannot be empty
-    if (!fullName) {
-      throw errorResponder(
-        errorTypes.VALIDATION_ERROR,
-        'Full name is required'
-      );
+    if (!username) {
+      throw errorResponder(errorTypes.VALIDATION_ERROR, 'Username is required');
     }
 
     // Email must be unique, if it is changed
@@ -129,7 +125,7 @@ async function updateUser(request, response, next) {
     const success = await usersService.updateUser(
       request.params.id,
       email,
-      fullName
+      username
     );
 
     if (!success) {
