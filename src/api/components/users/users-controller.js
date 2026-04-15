@@ -187,57 +187,6 @@ async function deleteUser(request, response, next) {
   }
 }
 
-async function login(request, response, next) {
-  try {
-    const { email, password } = request.body;
-
-    // validasi input
-    if (!email || !password) {
-      throw errorResponder(
-        errorTypes.VALIDATION_ERROR,
-        'Email and password are required'
-      );
-    }
-
-    // ambil user dari DB (INI YANG BENAR)
-    const user = await usersService.getUserByEmail(email);
-
-    if (!user) {
-      throw errorResponder(
-        errorTypes.UNAUTHORIZED,
-        'Invalid email or password'
-      );
-    }
-
-    // cek password
-    const isValid = await bcrypt.compare(password, user.password);
-
-    if (!isValid) {
-      throw errorResponder(
-        errorTypes.UNAUTHORIZED,
-        'Invalid email or password'
-      );
-    }
-
-    // buat token
-    const token = jwt.sign(
-      {
-        id: user._id,
-        username: user.username,
-      },
-      'secretkey',
-      { expiresIn: '1d' }
-    );
-
-    return response.status(200).json({
-      message: 'Login success',
-      token,
-    });
-  } catch (error) {
-    return next(error);
-  }
-}
-
 module.exports = {
   getUsers,
   getUser,
@@ -245,5 +194,4 @@ module.exports = {
   updateUser,
   changePassword,
   deleteUser,
-  login,
 };

@@ -1,13 +1,12 @@
 const express = require('express');
 const tweetsController = require('./tweets-controller');
-const auth = require('../../../utils/auth');
+const { authMiddleware } = require('../../middlewares');
 
-const router = express.Router();
+const route = express.Router();
 
 module.exports = (app) => {
   // semua route tweets diprefix /tweets
-  app.use('/tweets', router);
+  app.use('/tweets', route);
 
-  // CREATE tweet (harus login)
-  router.post('/', auth, tweetsController.createTweet);
+  route.post('/', authMiddleware, tweetsController.createTweet);
 };
