@@ -8,10 +8,9 @@ const logger = require('./logger')('app');
 const routes = require('../api/routes');
 const { errorResponder, errorTypes } = require('./errors');
 
-const app = express();
+const trackUsage = require('../api/middlewares/trackUsage.middleware');
 
-const trackUsage = require('./middlewares/trackUsage.middleware');
-app.use(trackUsage);
+const app = express();
 
 // Useful if behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc).
 // It shows the real origin IP in the Heroku or Cloudwatch logs.
@@ -31,6 +30,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Log HTTP requests with Pino
 app.use(pinoHTTP({ logger }));
+
+app.use(trackUsage);
 
 // API routes
 app.use(`${config.api.prefix}`, routes());
