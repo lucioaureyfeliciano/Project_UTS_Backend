@@ -1,11 +1,10 @@
 module.exports = (db) =>
   db.model(
-    'Tweets',
+    'Retweets',
     db.Schema(
       {
         tweetId: {
           type: String,
-          unique: true,
           required: true,
         },
 
@@ -15,13 +14,7 @@ module.exports = (db) =>
           required: true,
         },
 
-        text: {
-          type: String,
-          required: true,
-          trim: true,
-        },
-
-        createdAt: {
+        retweetedAt: {
           type: Date,
           default: Date.now,
         },
