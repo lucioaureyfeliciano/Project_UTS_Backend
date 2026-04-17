@@ -20,12 +20,10 @@ module.exports = (db) => {
   });
 
   schema.set("toJSON", {
-    transform: function (doc, ret) {
-      delete ret._id;
-      delete ret.__v;
-      delete ret.password;
+    transform(doc, ret) {
+      const { _id, __v, password, ...cleanRet } = ret;
+      return cleanRet;
     },
   });
-
   return db.model("Users", schema);
 };
