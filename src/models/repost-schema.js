@@ -10,7 +10,6 @@ module.exports = (db) =>
 
         userId: {
           type: String,
-          unique: true,
           required: true,
         },
 

@@ -7,6 +7,7 @@ const notifications = require('./components/notifications/notifications-route');
 const auth = require('./components/auth/auth-route');
 const tweets = require('./components/tweets/tweets-route');
 const repost = require('./components/repost/repost-route');
+const likes = require('./components/likes/likes-route');
 
 module.exports = () => {
   const app = express.Router();
@@ -18,6 +19,7 @@ module.exports = () => {
   auth(app);
   tweets(app);
   repost(app);
+  likes(app);
 
   return app;
 };

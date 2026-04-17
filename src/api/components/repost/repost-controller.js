@@ -6,11 +6,11 @@ async function repostTweet(request, response, next) {
     const { tweetId } = request.params;
     const { user } = request;
 
-    if (!user || !user.id) {
+    if (!user || !user.userId) {
       throw errorResponder(errorTypes.UNAUTHORIZED, 'User not authenticated');
     }
 
-    const result = await retweetsService.repostTweet(tweetId, user.id);
+    const result = await retweetsService.repostTweet(tweetId, user.userId);
 
     if (result.error === 'NOT_FOUND') {
       throw errorResponder(errorTypes.DATA_NOT_FOUND, result.message);
@@ -30,11 +30,11 @@ async function unrepostTweet(request, response, next) {
     const { tweetId } = request.params;
     const { user } = request;
 
-    if (!user || !user.id) {
+    if (!user || !user.userId) {
       throw errorResponder(errorTypes.UNAUTHORIZED, 'User not authenticated');
     }
 
-    const result = await retweetsService.unrepostTweet(tweetId, user.id);
+    const result = await retweetsService.unrepostTweet(tweetId, user.userId);
 
     if (result.error === 'NOT_FOUND') {
       throw errorResponder(errorTypes.DATA_NOT_FOUND, result.message);
