@@ -43,7 +43,7 @@ async function getCommunityMembers(request, response, next) {
 async function createCommunity(request, response, next) {
   try {
     const { name, description, isPrivate } = request.body;
-    const creatorId = request.body.creatorId;
+    const creatorId = request.user._id;
 
     if (!name) {
       throw errorResponder(
@@ -75,7 +75,7 @@ async function createCommunity(request, response, next) {
 async function joinCommunity(request, response, next) {
   try {
     const { id } = request.params;
-    const { userId } = request.body;
+    const userId = request.user._id;
 
     if (!userId) {
       throw errorResponder(errorTypes.VALIDATION_ERROR, 'User ID is required');
@@ -98,7 +98,7 @@ async function joinCommunity(request, response, next) {
 async function leaveCommunity(request, response, next) {
   try {
     const { id } = request.params;
-    const { userId } = request.body;
+    const userId = request.user._id;
 
     if (!userId) {
       throw errorResponder(errorTypes.VALIDATION_ERROR, 'User ID is required');
