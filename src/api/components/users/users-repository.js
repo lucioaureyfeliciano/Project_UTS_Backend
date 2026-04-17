@@ -1,4 +1,4 @@
-const { Users } = require('../../../models');
+const { Users } = require("../../../models");
 
 function generateUserId() {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -13,7 +13,11 @@ async function getUsers() {
   return Users.find({});
 }
 
+<<<<<<< HEAD
 async function getUser(userId) {
+=======
+async function getUserById(userId) {
+>>>>>>> 9371e0a61b83857b3c169c3f21eb5a41ff711340
   return Users.findOne({ userId });
 }
 
@@ -46,7 +50,7 @@ async function deleteUser(userId) {
 module.exports = {
   generateUserId,
   getUsers,
-  getUser,
+  getUserById,
   getUserByEmail,
   createUser,
   updateUser,

@@ -2,12 +2,10 @@ const jwt = require('jsonwebtoken');
 const authRepository = require('./auth-repository');
 const { passwordMatched } = require('../../../utils/password');
 
-function generateToken(user) {
+function generateToken(email) {
   const secretKey = 'RANDOM_STRING';
   const payload = {
-    userId: user.userId,
-    username: user.username,
-    email: user.email,
+    email,
     timestamp: Date.now(),
   };
 
@@ -18,7 +16,6 @@ async function checkLogin(email, password) {
   const user = await authRepository.getUserByEmail(email);
 
   const userPass = user ? user.password : '<RANDOM>';
-
   const loginPassed = await passwordMatched(password, userPass);
 
   if (user && loginPassed) {
