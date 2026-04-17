@@ -1,11 +1,11 @@
-const { Users } = require('../../../models');
+const { Users } = require("../../../models");
 
 async function getUsers() {
   return Users.find({});
 }
 
-async function getUser(id) {
-  return Users.findById(id);
+async function getUserById(userId) {
+  return Users.findOne({ userId });
 }
 
 async function getUserByEmail(email) {
@@ -30,7 +30,7 @@ async function deleteUser(id) {
 
 module.exports = {
   getUsers,
-  getUser,
+  getUserById,
   getUserByEmail,
   createUser,
   updateUser,
