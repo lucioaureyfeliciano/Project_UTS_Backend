@@ -1,7 +1,7 @@
 const communityRepository = require('./community-repository');
 
-async function getCommunities() {
-  return communityRepository.getCommunities();
+async function getCommunity() {
+  return communityRepository.getCommunity();
 }
 
 async function getCommunity(id) {
@@ -62,7 +62,7 @@ async function deleteCommunity(id) {
 }
 
 module.exports = {
-  getCommunities,
+  getCommunity,
   getCommunity,
   getCommunityMembers,
   createCommunity,

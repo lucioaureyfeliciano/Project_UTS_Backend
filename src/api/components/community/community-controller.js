@@ -1,10 +1,10 @@
 const communityService = require('./community-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
-async function getCommunities(request, response, next) {
+async function getCommunity(request, response, next) {
   try {
-    const communities = await communityService.getCommunities();
-    return response.status(200).json(communities);
+    const community = await communityService.getCommunity();
+    return response.status(200).json(community);
   } catch (error) {
     return next(error);
   }
@@ -158,7 +158,7 @@ async function deleteCommunity(request, response, next) {
 }
 
 module.exports = {
-  getCommunities,
+  getCommunity,
   getCommunity,
   getCommunityMembers,
   createCommunity,

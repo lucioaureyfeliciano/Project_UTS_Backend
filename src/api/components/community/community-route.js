@@ -5,10 +5,10 @@ const authMiddleware = require('../../middlewares/authentication');
 const route = express.Router();
 
 module.exports = (app) => {
-  app.use('/communities', route);
+  app.use('/community', route);
 
-  // Get list of communities
-  route.get('/', communityController.getCommunities);
+  // Get list of community
+  route.get('/', communityController.getCommunity);
 
   // Get a community by id
   route.get('/:id', communityController.getCommunity);
