@@ -1,20 +1,40 @@
-const express = require('express');
-const commentsController = require('./comments-controller');
-
-const route = express.Router({ mergeParams: true }); // penting: mergeParams agar :id dari posts terbaca
+const express = require("express");
+const commentsController = require("./comments-controller");
+const { authMiddleware } = require("../../middlewares");
+const route = express.Router();
+const tweetRoute = express.Router();
 
 module.exports = (app) => {
-  app.use('/posts/:id/comments', route);
+  app.use("/comments", route);
 
-  // GET  /posts/:id/comments  -> ambil semua komentar pada post
-  route.get('/', commentsController.getComments);
+  // PUT  /comments/:id        -> edit komentar (harus login)
+  route.put("/:id", authMiddleware, commentsController.updateComment);
 
-  // POST /posts/:id/comments  -> tambah komentar
-  route.post('/', commentsController.createComment);
+  // DELETE /comments/:id      -> hapus komentar (harus login)
+  route.delete("/:id", authMiddleware, commentsController.deleteComment);
 
-  // PUT  /comments/:id        -> edit komentar
-  app.put('/comments/:id', commentsController.updateComment);
+  // POST /comments/:id/replies-> reply komentar (harus login)
+  route.post("/:id/replies", authMiddleware, commentsController.createReply);
 
-  // DELETE /comments/:id      -> hapus komentar
-  app.delete('/comments/:id', commentsController.deleteComment);
+  // GET /comments/:id/replies -> ambil semua reply
+  route.get("/:id/replies", commentsController.getRepliesByCommentId);
+
+  // route khusus /tweets/:id/comments (gabung dengan tweets router)
+  app.use("/tweets", tweetRoute);
+
+  // GET /tweets/:id/comments  -> ambil semua komentar tweet
+  tweetRoute.get("/:id/comments", commentsController.getCommentsByTweetId);
+
+  // POST /tweets/:id/comments -> buat komentar (harus login)
+  tweetRoute.post(
+    "/:id/comments",
+    authMiddleware,
+    commentsController.createComment,
+  );
+
+  // GET /tweets/:id/comments/count -> hitung total komentar
+  tweetRoute.get(
+    "/:id/comments/count",
+    commentsController.countCommentsByTweetId,
+  );
 };

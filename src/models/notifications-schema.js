@@ -1,26 +1,58 @@
-module.exports = (db) =>
-  db.model(
-    'Notifications',
-    db.Schema(
-      {
-        recipientId: {
-          type: db.Schema.Types.ObjectId,
-          ref: 'Users',
-          required: true,
-        },
-        senderId: {
-          type: db.Schema.Types.ObjectId,
-          ref: 'Users',
-          required: true,
-        },
-        type: {
-          type: String,
-          enum: ['like', 'comment', 'follow', 'repost'],
-          required: true,
-        },
-        message: { type: String, required: true },
-        isRead: { type: Boolean, default: false },
-      },
-      { timestamps: true }
-    )
-  );
+const crypto = require("crypto");
+module.exports = (db) => {
+  const schema = db.Schema({
+    notifId: {
+      type: String,
+      unique: true,
+    },
+
+    userId: {
+      type: String,
+      required: true,
+    },
+
+    actorId: {
+      type: String,
+      required: true,
+    },
+
+    type: {
+      type: String,
+      enum: ["like", "comment", "follow", "repost"],
+      required: true,
+    },
+
+    tweetId: {
+      type: String,
+      default: null,
+    },
+
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
+
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  });
+
+  // AUTO GENERATE notifId
+  schema.pre("save", function (next) {
+    if (!this.notifId) {
+      const random = crypto.randomBytes(3).toString("hex");
+      this.notifId = `notif_${random}`;
+    }
+    next();
+  });
+
+  schema.set("toJSON", {
+    transform: function (doc, ret) {
+      delete ret._id;
+      delete ret.__v;
+    },
+  });
+
+  return db.model("Notifications", schema);
+};

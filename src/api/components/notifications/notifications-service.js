@@ -1,34 +1,49 @@
-const notificationsRepository = require('./notifications-repository');
+const notificationsRepository = require("./notifications-repository");
 
-async function getNotifications(recipientId) {
-  return notificationsRepository.getNotifications(recipientId);
+async function getNotifications(userId, requesterId, filter) {
+  if (userId !== requesterId) return "forbidden";
+  return notificationsRepository.getNotifications(userId, filter);
 }
 
-async function getUnreadCount(recipientId) {
-  return notificationsRepository.getUnreadCount(recipientId);
-}
-
-async function createNotification(recipientId, senderId, type, message) {
+async function createNotification(userId, actorId, type, tweetId) {
+  // tidak kirim notif ke diri sendiri
+  if (userId.toString() === actorId.toString()) return null;
   return notificationsRepository.createNotification(
-    recipientId,
-    senderId,
+    userId,
+    actorId,
     type,
-    message
+    tweetId,
   );
 }
-
-async function markAllAsRead(recipientId) {
-  return notificationsRepository.markAllAsRead(recipientId);
+async function markAsRead(userId, notifId, requesterId) {
+  if (userId !== requesterId) return "forbidden";
+  const result = await notificationsRepository.markAsRead(notifId, userId);
+  if (!result) return null;
+  return result;
 }
 
-async function deleteNotification(id) {
-  return notificationsRepository.deleteNotification(id);
+async function deleteNotification(userId, notifId, requesterId) {
+  if (userId !== requesterId) return "forbidden";
+  const result = await notificationsRepository.deleteNotification(
+    notifId,
+    userId,
+  );
+  if (!result) return null;
+  return true;
+}
+
+async function getUnreadCount(userId, requesterId) {
+  if (userId !== requesterId) return "forbidden";
+
+  const count = await notificationsRepository.countUnreadNotifications(userId);
+
+  return { userId, totalUnread: count };
 }
 
 module.exports = {
   getNotifications,
-  getUnreadCount,
   createNotification,
-  markAllAsRead,
+  markAsRead,
   deleteNotification,
+  getUnreadCount,
 };

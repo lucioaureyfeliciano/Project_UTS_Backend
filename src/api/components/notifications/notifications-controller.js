@@ -1,91 +1,137 @@
-const notificationsService = require('./notifications-service');
-const { errorResponder, errorTypes } = require('../../../core/errors');
+const notificationsService = require("./notifications-service");
+const { errorResponder, errorTypes } = require("../../../core/errors");
 
+// GET notifications
 async function getNotifications(request, response, next) {
   try {
-    const notifications = await notificationsService.getNotifications(
-      request.params.id
+    const filter = {
+      type: request.query.type || null,
+      status: request.query.status || null,
+    };
+
+    const result = await notificationsService.getNotifications(
+      request.params.id,
+      request.user.userId,
+      filter,
     );
-    return response.status(200).json(notifications);
-  } catch (error) {
-    return next(error);
-  }
-}
 
-async function getUnreadCount(request, response, next) {
-  try {
-    const count = await notificationsService.getUnreadCount(request.params.id);
-    return response.status(200).json({ unread_count: count });
-  } catch (error) {
-    return next(error);
-  }
-}
-
-async function createNotification(request, response, next) {
-  try {
-    const recipientId = request.params.id;
-    const { sender_id: senderId, type, message } = request.body;
-
-    if (!senderId || !type || !message) {
+    if (result === "forbidden") {
       throw errorResponder(
-        errorTypes.VALIDATION_ERROR,
-        'sender_id, type, and message are required'
+        errorTypes.FORBIDDEN,
+        "Anda tidak memiliki akses ke notifikasi ini",
       );
     }
 
-    const validTypes = ['like', 'comment', 'follow', 'repost'];
+    return response.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// CREATE notification
+async function createNotification(request, response, next) {
+  try {
+    const { actorId, type, tweetId } = request.body;
+
+    if (!actorId || !type) {
+      throw errorResponder(
+        errorTypes.VALIDATION_ERROR,
+        "Field actorId have to be filled and type is required",
+      );
+    }
+
+    const validTypes = ["like", "follow", "comment", "repost"];
+
     if (!validTypes.includes(type)) {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
-        `Type must be one of: ${validTypes.join(', ')}`
+        "Type must be one of: like, follow, comment, repost",
       );
     }
 
-    const notification = await notificationsService.createNotification(
-      recipientId,
-      senderId,
+    const result = await notificationsService.createNotification(
+      request.params.id,
+      actorId,
       type,
-      message
+      tweetId || null,
     );
 
-    if (!notification) {
+    return response.status(201).json(result);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// MARK AS READ
+async function markAsRead(request, response, next) {
+  try {
+    const result = await notificationsService.markAsRead(
+      request.params.id,
+      request.params.notif_id,
+      request.user.userId,
+    );
+
+    if (result === "forbidden") {
       throw errorResponder(
-        errorTypes.UNPROCESSABLE_ENTITY,
-        'Failed to create notification'
+        errorTypes.FORBIDDEN,
+        "You do not have access to this notification",
       );
     }
 
-    return response
-      .status(201)
-      .json({ message: 'Notification created', notification });
+    if (result === null) {
+      throw errorResponder(errorTypes.NOT_FOUND, "Notification not found");
+    }
+
+    return response.status(200).json(result);
   } catch (error) {
     return next(error);
   }
 }
 
-async function markAllAsRead(request, response, next) {
-  try {
-    await notificationsService.markAllAsRead(request.params.id);
-    return response
-      .status(200)
-      .json({ message: 'All notifications marked as read' });
-  } catch (error) {
-    return next(error);
-  }
-}
-
+// DELETE
 async function deleteNotification(request, response, next) {
   try {
-    const success = await notificationsService.deleteNotification(
-      request.params.notif_id
+    const result = await notificationsService.deleteNotification(
+      request.params.id,
+      request.params.notif_id,
+      request.user.userId,
     );
-    if (!success) {
+
+    if (result === "forbidden") {
       throw errorResponder(
-        errorTypes.UNPROCESSABLE_ENTITY,
-        'Failed to delete notification'
+        errorTypes.FORBIDDEN,
+        "You do not have access to this notification",
       );
     }
-    return response.status(200).json({ message: 'Notification deleted' });
+
+    if (result === null) {
+      throw errorResponder(errorTypes.NOT_FOUND, "Notification not found");
+    }
+
+    return response.status(200).json({
+      message: "Notification deleted successfully",
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// GET unread count
+async function getUnreadCount(request, response, next) {
+  try {
+    const result = await notificationsService.getUnreadCount(
+      request.params.id,
+      request.user.userId,
+    );
+
+    if (result === "forbidden") {
+      throw errorResponder(
+        errorTypes.FORBIDDEN,
+        "You do not have access to this notification",
+      );
+    }
+
+    return response.status(200).json(result);
   } catch (error) {
     return next(error);
   }
@@ -93,8 +139,8 @@ async function deleteNotification(request, response, next) {
 
 module.exports = {
   getNotifications,
-  getUnreadCount,
   createNotification,
-  markAllAsRead,
+  markAsRead,
   deleteNotification,
+  getUnreadCount,
 };

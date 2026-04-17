@@ -1,30 +1,51 @@
 const bookmarksRepository = require("./bookmarks-repository");
 
-async function getBookmarks(userId) {
-  return bookmarksRepository.getBookmarks(userId);
+async function getBookmarks(userId, requesterId) {
+  if (userId !== requesterId) return "forbidden";
+  return bookmarksRepository.getBookmarksByUserId(userId);
 }
 
-async function bookmarkExists(userId, tweetId) {
-  const bookmark = await bookmarksRepository.getBookmark(userId, tweetId);
-  return !!bookmark;
+async function addBookmark(userId, tweetId, requesterId) {
+  if (userId !== requesterId) return "forbidden";
+
+  const existing = await bookmarksRepository.findBookmark(userId, tweetId);
+  if (existing) return "already_bookmarked";
+  return bookmarksRepository.createBookmark(userId, tweetId);
 }
 
-async function addBookmark(userId, tweetId) {
-  return bookmarksRepository.addBookmark(userId, tweetId);
+async function removeBookmark(userId, tweetId, requesterId) {
+  if (userId !== requesterId) return "forbidden";
+
+  const existing = await bookmarksRepository.findBookmark(userId, tweetId);
+  if (!existing) return "not_found";
+
+  await bookmarksRepository.deleteBookmark(userId, tweetId);
+  return true;
 }
 
-async function removeBookmark(userId, tweetId) {
-  return bookmarksRepository.removeBookmark(userId, tweetId);
+async function clearBookmarks(userId, requesterId) {
+  if (userId !== requesterId) return "forbidden";
+  await bookmarksRepository.deleteAllBookmarks(userId);
+  return true;
 }
 
-async function removeAllBookmarks(userId) {
-  return bookmarksRepository.removeAllBookmarks(userId);
+async function checkBookmark(userId, tweetId, requesterId) {
+  if (userId !== requesterId) return "forbidden";
+  const existing = await bookmarksRepository.findBookmark(userId, tweetId);
+  return { isBookmarked: !!existing };
+}
+
+async function countBookmarks(userId, requesterId) {
+  if (userId !== requesterId) return "forbidden";
+  const count = await bookmarksRepository.countBookmarks(userId);
+  return { userId, totalBookmarks: count };
 }
 
 module.exports = {
   getBookmarks,
-  bookmarkExists,
   addBookmark,
   removeBookmark,
-  removeAllBookmarks,
+  clearBookmarks,
+  checkBookmark,
+  countBookmarks,
 };

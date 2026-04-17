@@ -1,34 +1,59 @@
 const bookmarksService = require("./bookmarks-service");
 const { errorResponder, errorTypes } = require("../../../core/errors");
 
+function handleForbiddenOrNotFound(result, next) {
+  if (result === "forbidden") {
+    return next(
+      errorResponder(
+        errorTypes.FORBIDDEN,
+        "Anda tidak memiliki akses ke bookmark ini",
+      ),
+    );
+  }
+  return null;
+}
+
+// GET /users/:id/bookmarks
 async function getBookmarks(request, response, next) {
   try {
-    const bookmarks = await bookmarksService.getBookmarks(request.params.id);
-    return response.status(200).json(bookmarks);
+    const result = await bookmarksService.getBookmarks(
+      request.params.id,
+      request.user.id,
+    );
+
+    if (handleForbiddenOrNotFound(result, next)) return null;
+    return response.status(200).json(result);
   } catch (error) {
     return next(error);
   }
 }
 
+// POST /users/:id/bookmarks
 async function addBookmark(request, response, next) {
   try {
-    const userId = request.params.id;
-    const { tweet_id: tweetId } = request.body;
+    const { tweetId } = request.body;
 
     if (!tweetId) {
       throw errorResponder(errorTypes.VALIDATION_ERROR, "Tweet ID is required");
     }
 
+    const result = await bookmarksService.addBookmark(
+      request.params.id,
+      tweetId,
+      request.user.id,
+    );
+
+    if (handleForbiddenOrNotFound(result, next)) return null;
+
     // Cek apakah sudah di-bookmark
-    if (await bookmarksService.bookmarkExists(userId, tweetId)) {
+    if (result === "already_bookmarked") {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
         "Tweet already bookmarked",
       );
     }
 
-    const bookmark = await bookmarksService.addBookmark(userId, tweetId);
-    if (!bookmark) {
+    if (!result) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
         "Failed to add bookmark",
@@ -37,24 +62,30 @@ async function addBookmark(request, response, next) {
 
     return response
       .status(201)
-      .json({ message: "Bookmark added successfully" });
+      .json({ message: "Bookmark added successfully", result });
   } catch (error) {
     return next(error);
   }
 }
 
+// DELETE /users/:id/bookmarks/:tweet_id
 async function removeBookmark(request, response, next) {
   try {
-    const { id: userId, tweet_id: tweetId } = request.params;
+    const result = await bookmarksService.removeBookmark(
+      request.params.id,
+      request.params.tweet_id,
+      request.user.id,
+    );
 
-    if (!(await bookmarksService.bookmarkExists(userId, tweetId))) {
+    if (handleForbiddenOrNotFound(result, next)) return null;
+
+    if (result === "not_found") {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
         "Bookmark not found",
       );
     }
 
-    await bookmarksService.removeBookmark(userId, tweetId);
     return response
       .status(200)
       .json({ message: "Bookmark removed successfully" });
@@ -63,10 +94,48 @@ async function removeBookmark(request, response, next) {
   }
 }
 
-async function removeAllBookmarks(request, response, next) {
+// DELETE /users/:id/bookmarks
+async function clearBookmarks(request, response, next) {
   try {
-    await bookmarksService.removeAllBookmarks(request.params.id);
+    const result = await bookmarksService.clearBookmarks(
+      request.params.id,
+      request.user.id,
+    );
+
+    if (handleForbiddenOrNotFound(result, next)) return null;
+
     return response.status(200).json({ message: "All bookmarks cleared" });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// GET /api/users/:id/bookmarks/check/:tweet_id
+async function checkBookmark(request, response, next) {
+  try {
+    const result = await bookmarksService.checkBookmark(
+      request.params.id,
+      request.params.tweet_id,
+      request.user.id,
+    );
+
+    if (handleForbiddenOrNotFound(result, next)) return null;
+    return response.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// GET /api/users/:id/bookmarks/count
+async function countBookmarks(request, response, next) {
+  try {
+    const result = await bookmarksService.countBookmarks(
+      request.params.id,
+      request.user.id,
+    );
+
+    if (handleForbiddenOrNotFound(result, next)) return null;
+    return response.status(200).json(result);
   } catch (error) {
     return next(error);
   }
@@ -76,5 +145,7 @@ module.exports = {
   getBookmarks,
   addBookmark,
   removeBookmark,
-  removeAllBookmarks,
+  clearBookmarks,
+  checkBookmark,
+  countBookmarks,
 };

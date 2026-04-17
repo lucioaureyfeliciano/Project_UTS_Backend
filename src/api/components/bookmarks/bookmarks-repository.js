@@ -1,29 +1,34 @@
 const { Bookmarks } = require("../../../models");
 
-async function getBookmarks(userId) {
-  return Bookmarks.find({ userId }).sort({ createdAt: -1 });
+async function getBookmarksByUserId(userId) {
+  return Bookmarks.find({ userId }).populate("tweetId").sort({ createdAt: -1 });
 }
 
-async function getBookmark(userId, tweetId) {
+async function findBookmark(userId, tweetId) {
   return Bookmarks.findOne({ userId, tweetId });
 }
 
-async function addBookmark(userId, tweetId) {
+async function createBookmark(userId, tweetId) {
   return Bookmarks.create({ userId, tweetId });
 }
 
-async function removeBookmark(userId, tweetId) {
-  return Bookmarks.deleteOne({ userId, tweetId });
+async function deleteBookmark(userId, tweetId) {
+  return Bookmarks.findOneAndDelete({ userId, tweetId });
 }
 
-async function removeAllBookmarks(userId) {
+async function deleteAllBookmarks(userId) {
   return Bookmarks.deleteMany({ userId });
 }
 
+async function countBookmarks(userId) {
+  return Bookmarks.countDocuments({ userId });
+}
+
 module.exports = {
-  getBookmarks,
-  getBookmark,
-  addBookmark,
-  removeBookmark,
-  removeAllBookmarks,
+  getBookmarksByUserId,
+  findBookmark,
+  createBookmark,
+  deleteBookmark,
+  deleteAllBookmarks,
+  countBookmarks,
 };

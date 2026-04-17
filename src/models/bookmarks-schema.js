@@ -8,7 +8,11 @@ module.exports = (db) =>
           ref: "Users",
           required: true,
         },
-        tweetId: { type: db.Schema.Types.ObjectId, required: true },
+        tweetId: {
+          type: db.Schema.Types.ObjectId,
+          ref: "Tweets",
+          required: true,
+        },
       },
       { timestamps: true },
     ),

@@ -1,6 +1,8 @@
-const usersService = require('./users-service');
-const { errorResponder, errorTypes } = require('../../../core/errors');
-const { hashPassword } = require('../../../utils/password');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const usersService = require("./users-service");
+const { errorResponder, errorTypes } = require("../../../core/errors");
+const { hashPassword } = require("../../../utils/password");
 
 async function getUsers(request, response, next) {
   try {
@@ -17,7 +19,7 @@ async function getUser(request, response, next) {
     const user = await usersService.getUser(request.params.id);
 
     if (!user) {
-      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'User not found');
+      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, "User not found");
     }
 
     return response.status(200).json(user);
@@ -31,28 +33,25 @@ async function createUser(request, response, next) {
     const {
       email,
       password,
-      full_name: fullName,
+      username,
       confirm_password: confirmPassword,
     } = request.body;
 
     // Email is required and cannot be empty
     if (!email) {
-      throw errorResponder(errorTypes.VALIDATION_ERROR, 'Email is required');
+      throw errorResponder(errorTypes.VALIDATION_ERROR, "Email is required");
     }
 
     // Full name is required and cannot be empty
-    if (!fullName) {
-      throw errorResponder(
-        errorTypes.VALIDATION_ERROR,
-        'Full name is required'
-      );
+    if (!username) {
+      throw errorResponder(errorTypes.VALIDATION_ERROR, "Username is required");
     }
 
     // Email must be unique
     if (await usersService.emailExists(email)) {
       throw errorResponder(
         errorTypes.EMAIL_ALREADY_TAKEN,
-        'Email already exists'
+        "Email already exists",
       );
     }
 
@@ -60,7 +59,7 @@ async function createUser(request, response, next) {
     if (password.length < 8) {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
-        'Password must be at least 8 characters long'
+        "Password must be at least 8 characters long",
       );
     }
 
@@ -68,7 +67,7 @@ async function createUser(request, response, next) {
     if (password !== confirmPassword) {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
-        'Password and confirm password do not match'
+        "Password and confirm password do not match",
       );
     }
 
@@ -76,20 +75,19 @@ async function createUser(request, response, next) {
     const hashedPassword = await hashPassword(password);
 
     // Create the user
-    const success = await usersService.createUser(
-      email,
-      hashedPassword,
-      fullName
-    );
+    const user = await usersService.createUser(email, hashedPassword, username);
 
-    if (!success) {
+    if (!user) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
-        'Failed to create user'
+        "Failed to create user",
       );
     }
 
-    return response.status(201).json({ message: 'User created successfully' });
+    return response.status(201).json({
+      message: "User created successfully",
+      userId: user.userId,
+    });
   } catch (error) {
     return next(error);
   }
@@ -97,49 +95,46 @@ async function createUser(request, response, next) {
 
 async function updateUser(request, response, next) {
   try {
-    const { email, full_name: fullName } = request.body;
+    const { email, username } = request.body;
 
     // User must exist
     const user = await usersService.getUser(request.params.id);
     if (!user) {
-      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'User not found');
+      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, "User not found");
     }
 
     // Email is required and cannot be empty
     if (!email) {
-      throw errorResponder(errorTypes.VALIDATION_ERROR, 'Email is required');
+      throw errorResponder(errorTypes.VALIDATION_ERROR, "Email is required");
     }
 
     // Full name is required and cannot be empty
-    if (!fullName) {
-      throw errorResponder(
-        errorTypes.VALIDATION_ERROR,
-        'Full name is required'
-      );
+    if (!username) {
+      throw errorResponder(errorTypes.VALIDATION_ERROR, "Username is required");
     }
 
     // Email must be unique, if it is changed
     if (email !== user.email && (await usersService.emailExists(email))) {
       throw errorResponder(
         errorTypes.EMAIL_ALREADY_TAKEN,
-        'Email already exists'
+        "Email already exists",
       );
     }
 
     const success = await usersService.updateUser(
       request.params.id,
       email,
-      fullName
+      username,
     );
 
     if (!success) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
-        'Failed to update user'
+        "Failed to update user",
       );
     }
 
-    return response.status(200).json({ message: 'User updated successfully' });
+    return response.status(200).json({ message: "User updated successfully" });
   } catch (error) {
     return next(error);
   }
@@ -181,11 +176,11 @@ async function deleteUser(request, response, next) {
     if (!success) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
-        'Failed to delete user'
+        "Failed to delete user",
       );
     }
 
-    return response.status(200).json({ message: 'User deleted successfully' });
+    return response.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     return next(error);
   }

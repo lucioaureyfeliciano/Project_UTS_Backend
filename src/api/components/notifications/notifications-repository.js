@@ -1,32 +1,43 @@
-const { Notifications } = require('../../../models');
+const { Notifications } = require("../../../models");
 
-async function getNotifications(recipientId) {
-  return Notifications.find({ recipientId }).sort({ createdAt: -1 });
+async function getNotifications(userId, filter) {
+  const query = { userId };
+
+  if (filter.type) query.type = filter.type;
+  if (filter.status === "unread") query.isRead = false;
+
+  return Notifications.find(query)
+    .populate("actorId", "username")
+    .sort({ createdAt: -1 });
 }
 
-async function getUnreadCount(recipientId) {
-  return Notifications.countDocuments({ recipientId, isRead: false });
+async function createNotification(userId, actorId, type, tweetId) {
+  return Notifications.create({ userId, actorId, type, tweetId });
 }
 
-async function createNotification(recipientId, senderId, type, message) {
-  return Notifications.create({ recipientId, senderId, type, message });
-}
-
-async function markAllAsRead(recipientId) {
-  return Notifications.updateMany(
-    { recipientId, isRead: false },
-    { $set: { isRead: true } }
+async function markAsRead(notifId, userId) {
+  return Notifications.findOneAndUpdate(
+    { _id: notifId, userId },
+    { isRead: true },
+    { new: true },
   );
 }
 
-async function deleteNotification(id) {
-  return Notifications.deleteOne({ _id: id });
+async function deleteNotification(notifId, userId) {
+  return Notifications.findOneAndDelete({ _id: notifId, userId });
+}
+
+async function countUnreadNotifications(userId) {
+  return Notifications.countDocuments({
+    userId,
+    isRead: false,
+  });
 }
 
 module.exports = {
   getNotifications,
-  getUnreadCount,
   createNotification,
-  markAllAsRead,
+  markAsRead,
   deleteNotification,
+  countUnreadNotifications,
 };
