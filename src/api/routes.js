@@ -6,6 +6,8 @@ const bookmarks = require("./components/bookmarks/bookmarks-route.js");
 const notifications = require("./components/notifications/notifications-route.js");
 const auth = require("./components/auth/auth-route");
 const tweets = require("./components/tweets/tweets-route");
+const books = require('./components/books/books-route');
+const repost = require('./components/repost/repost-route');
 
 module.exports = () => {
   const app = express.Router();
@@ -16,6 +18,7 @@ module.exports = () => {
   bookmarks(app);
   auth(app);
   tweets(app);
+  repost(app);
 
   return app;
 };
