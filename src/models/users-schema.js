@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+
 module.exports = (db) => {
   const schema = db.Schema({
     userId: {
@@ -25,5 +26,6 @@ module.exports = (db) => {
       return cleanRet;
     },
   });
+
   return db.model("Users", schema);
 };
