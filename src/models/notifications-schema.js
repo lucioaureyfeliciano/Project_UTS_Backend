@@ -50,8 +50,8 @@ module.exports = (db) => {
 
   schema.set('toJSON', {
     transform(doc, ret) {
-      delete ret._id;
-      delete ret.__v;
+      const { _id, __v, password, ...cleanRet } = ret;
+      return cleanRet;
     },
   });
 
