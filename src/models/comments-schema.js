@@ -2,9 +2,14 @@ const crypto = require("crypto");
 
 module.exports = (db) => {
   const schema = db.Schema({
-    tweetsId: {
+    commentId: {
       type: String,
       unique: true,
+    },
+
+    tweetId: {
+      type: String,
+      required: true,
     },
 
     userId: {
@@ -12,15 +17,15 @@ module.exports = (db) => {
       required: true,
     },
 
-    username: {
-      type: String,
-      required: true,
-    },
-
-    text: {
+    content: {
       type: String,
       required: true,
       trim: true,
+    },
+
+    parentId: {
+      type: String,
+      default: null,
     },
 
     createdAt: {
@@ -29,21 +34,21 @@ module.exports = (db) => {
     },
   });
 
-  // AUTO GENERATE tweetsId
+  // AUTO GENERATE commentId
   schema.pre("save", function (next) {
-    if (!this.tweetsId) {
+    if (!this.commentId) {
       const random = crypto.randomBytes(3).toString("hex");
-      this.tweetsId = `tw_${random}`;
+      this.commentId = `cmnt_${random}`;
     }
     next();
   });
 
   schema.set("toJSON", {
-    transform(doc, ret) {
-      const { _id, __v, ...cleanRet } = ret;
-      return cleanRet;
+    transform: function (doc, ret) {
+      delete ret._id;
+      delete ret.__v;
     },
   });
 
-  return db.model("Tweets", schema);
+  return db.model("Comments", schema);
 };

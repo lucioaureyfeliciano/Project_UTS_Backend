@@ -1,8 +1,7 @@
 const crypto = require("crypto");
-
 module.exports = (db) => {
   const schema = db.Schema({
-    tweetsId: {
+    notifId: {
       type: String,
       unique: true,
     },
@@ -12,15 +11,25 @@ module.exports = (db) => {
       required: true,
     },
 
-    username: {
+    actorId: {
       type: String,
       required: true,
     },
 
-    text: {
+    type: {
       type: String,
+      enum: ["like", "comment", "follow", "repost"],
       required: true,
-      trim: true,
+    },
+
+    tweetId: {
+      type: String,
+      default: null,
+    },
+
+    isRead: {
+      type: Boolean,
+      default: false,
     },
 
     createdAt: {
@@ -29,21 +38,21 @@ module.exports = (db) => {
     },
   });
 
-  // AUTO GENERATE tweetsId
+  // AUTO GENERATE notifId
   schema.pre("save", function (next) {
-    if (!this.tweetsId) {
+    if (!this.notifId) {
       const random = crypto.randomBytes(3).toString("hex");
-      this.tweetsId = `tw_${random}`;
+      this.notifId = `notif_${random}`;
     }
     next();
   });
 
   schema.set("toJSON", {
-    transform(doc, ret) {
-      const { _id, __v, ...cleanRet } = ret;
-      return cleanRet;
+    transform: function (doc, ret) {
+      delete ret._id;
+      delete ret.__v;
     },
   });
 
-  return db.model("Tweets", schema);
+  return db.model("Notifications", schema);
 };

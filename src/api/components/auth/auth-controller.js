@@ -1,5 +1,5 @@
-const authService = require('./auth-service');
-const { errorResponder, errorTypes } = require('../../../core/errors');
+const authService = require("./auth-service");
+const { errorResponder, errorTypes } = require("../../../core/errors");
 
 async function login(request, response, next) {
   try {
@@ -10,7 +10,7 @@ async function login(request, response, next) {
     if (!loginResult) {
       throw errorResponder(
         errorTypes.INVALID_CREDENTIALS,
-        'Wrong email or password'
+        "Wrong email or password",
       );
     }
 
@@ -22,7 +22,7 @@ async function login(request, response, next) {
 
 async function testProtected(request, response, next) {
   try {
-    return response.status(200).json({ message: 'OK' });
+    return response.status(200).json({ message: "OK" });
   } catch (error) {
     return next(error);
   }
