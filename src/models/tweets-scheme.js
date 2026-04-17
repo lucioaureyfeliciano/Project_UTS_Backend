@@ -10,8 +10,8 @@ module.exports = (db) =>
         },
 
         userId: {
-          type: db.Schema.Types.ObjectId,
-          ref: 'Users',
+          type: String,
+          unique: true,
           required: true,
         },
 
