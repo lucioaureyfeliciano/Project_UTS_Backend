@@ -2,7 +2,7 @@ const crypto = require("crypto");
 
 module.exports = (db) => {
   const schema = db.Schema({
-    tweetsId: {
+    tweetId: {
       type: String,
       unique: true,
     },
@@ -29,19 +29,23 @@ module.exports = (db) => {
     },
   });
 
-  // AUTO GENERATE tweetsId
+  // AUTO GENERATE tweetId
   schema.pre("save", function (next) {
-    if (!this.tweetsId) {
+    if (!this.tweetId) {
       const random = crypto.randomBytes(3).toString("hex");
-      this.tweetsId = `tw_${random}`;
+      this.tweetId = `tw_${random}`;
     }
     next();
   });
 
   schema.set("toJSON", {
     transform(doc, ret) {
-      const { _id, __v, ...cleanRet } = ret;
-      return cleanRet;
+      const { _id, __v, tweetId, ...rest } = ret;
+
+      return {
+        tweetId,
+        ...rest,
+      };
     },
   });
 

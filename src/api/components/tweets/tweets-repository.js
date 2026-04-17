@@ -1,21 +1,10 @@
-const { Tweets } = require('../../../models');
-
-function generateTweetId() {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let result = 'tw_';
-  for (let i = 0; i < 8; i += 1) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
+const { Tweets } = require("../../../models");
 
 async function createTweet(userId, username, text) {
-  const tweetId = generateTweetId();
   return Tweets.create({
     userId,
     username,
     text,
-    tweetId,
   });
 }
 
