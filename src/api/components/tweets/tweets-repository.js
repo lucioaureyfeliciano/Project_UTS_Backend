@@ -1,4 +1,4 @@
-const { Tweets, Likes, Retweets } = require('../../../models');
+const { Tweets, Likes, Retweets, Dislikes } = require('../../../models');
 
 async function createTweet(userId, username, text) {
   return Tweets.create({
@@ -19,11 +19,13 @@ async function getTweetByTweetId(tweetId) {
   }
 
   const likesCount = await Likes.countDocuments({ tweetId });
+  const dislikesCount = await Dislikes.countDocuments({ tweetId });
   const repostCount = await Retweets.countDocuments({ tweetId });
 
   return {
     ...tweet.toJSON(),
     likesCount,
+    dislikesCount,
     repostCount,
   };
 }
@@ -33,13 +35,17 @@ async function deleteTweetByTweetId(tweetId) {
   return Tweets.deleteOne({ tweetId });
 }
 
-// ambil tweets terbaru + total likes + repost
+// ambil tweets terbaru + total likes, dislikes + repost
 async function getRecentTweets() {
   const tweets = await Tweets.find().sort({ createdAt: -1 }).limit(10);
 
   const result = await Promise.all(
     tweets.map(async (tweet) => {
       const likesCount = await Likes.countDocuments({
+        tweetId: tweet.tweetId,
+      });
+
+      const dislikesCount = await Dislikes.countDocuments({
         tweetId: tweet.tweetId,
       });
 
@@ -50,6 +56,7 @@ async function getRecentTweets() {
       return {
         ...tweet.toJSON(),
         likesCount,
+        dislikesCount,
         repostCount,
       };
     })
