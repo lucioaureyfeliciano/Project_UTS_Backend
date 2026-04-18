@@ -1,22 +1,27 @@
-const retweetsService = require('./repost-service');
+const followsService = require('./follows-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
-async function repostTweet(request, response, next) {
+async function followUser(request, response, next) {
   try {
-    const { tweetId } = request.params;
+    const { userId } = request.params;
     const { user } = request;
 
     if (!user || !user.userId) {
       throw errorResponder(errorTypes.UNAUTHORIZED, 'User not authenticated');
     }
 
-    const result = await retweetsService.repostTweet(tweetId, user.userId);
+    const result = await followsService.followUser(userId, user.userId);
 
     if (result.error === 'NOT_FOUND') {
       throw errorResponder(errorTypes.DATA_NOT_FOUND, result.message);
     }
+
     if (result.error === 'CONFLICT') {
       throw errorResponder(errorTypes.EMAIL_ALREADY_TAKEN, result.message);
+    }
+
+    if (result.error === 'VALIDATION') {
+      throw errorResponder(errorTypes.VALIDATION_ERROR, result.message);
     }
 
     return response.status(201).json(result);
@@ -25,16 +30,16 @@ async function repostTweet(request, response, next) {
   }
 }
 
-async function unrepostTweet(request, response, next) {
+async function unfollowUser(request, response, next) {
   try {
-    const { tweetId } = request.params;
+    const { userId } = request.params;
     const { user } = request;
 
     if (!user || !user.userId) {
       throw errorResponder(errorTypes.UNAUTHORIZED, 'User not authenticated');
     }
 
-    const result = await retweetsService.unrepostTweet(tweetId, user.userId);
+    const result = await followsService.unfollowUser(userId, user.userId);
 
     if (result.error === 'NOT_FOUND') {
       throw errorResponder(errorTypes.DATA_NOT_FOUND, result.message);
@@ -46,11 +51,11 @@ async function unrepostTweet(request, response, next) {
   }
 }
 
-async function getRepostsOfTweet(request, response, next) {
+async function getFollowers(request, response, next) {
   try {
-    const { tweetId } = request.params;
+    const { userId } = request.params;
 
-    const result = await retweetsService.getRepostsOfTweet(tweetId);
+    const result = await followsService.getFollowers(userId);
 
     if (result.error === 'NOT_FOUND') {
       throw errorResponder(errorTypes.DATA_NOT_FOUND, result.message);
@@ -63,7 +68,7 @@ async function getRepostsOfTweet(request, response, next) {
 }
 
 module.exports = {
-  repostTweet,
-  unrepostTweet,
-  getRepostsOfTweet,
+  followUser,
+  unfollowUser,
+  getFollowers,
 };

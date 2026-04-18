@@ -17,7 +17,7 @@ async function deleteRepost(tweetId, userId) {
 
 // Ambil semua repost dari suatu tweet
 async function getRepostsByTweetId(tweetId) {
-  return Retweets.find({ tweetId }).populate('userId', 'username email');
+  return Retweets.find({ tweetId });
 }
 
 // Mengecek apakah tweet dengan tweetId tsb ada

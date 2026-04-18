@@ -30,8 +30,11 @@ module.exports = (app) => {
   // GET /comments/:id/replies -> ambil semua reply
   route.get('/:id/replies', commentsController.getRepliesByCommentId);
 
-  // GET /tweets/:id/comments  -> ambil semua komentar tweet
+  // GET /tweets/:id/comments  -> ambil semua komentar tweet berdasarkan id tweet
   tweetRoute.get('/:id/comments', commentsController.getCommentsByTweetId);
+
+  // GET /comments/:id         -> ambil sebuah komentar berdasarkan id komentar
+  route.get('/:id', commentsController.getCommentById);
 
   // GET /tweets/:id/comments/count -> hitung total komentar
   tweetRoute.get(
