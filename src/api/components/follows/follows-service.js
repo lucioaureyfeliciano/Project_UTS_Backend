@@ -1,5 +1,7 @@
 const followsRepository = require('./follows-repository');
 const { Users } = require('../../../models');
+// untuk endpoint notifications
+const notificationsRepository = require('../notifications/notifications-repository');
 
 async function followUser(targetUserId, currentUserId) {
   if (targetUserId === currentUserId) {
@@ -38,6 +40,14 @@ async function followUser(targetUserId, currentUserId) {
   const followerUser = await followsRepository.getUserByUserId(currentUserId);
 
   const followingUser = await followsRepository.getUserByUserId(targetUserId);
+
+  // untuk endpoint notifications
+  await notificationsRepository.createNotification(
+    targetUserId,
+    currentUserId,
+    'follow',
+    null
+  );
 
   return {
     message: 'Followed successfully',

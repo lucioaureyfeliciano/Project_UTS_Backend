@@ -53,7 +53,7 @@ async function deleteComment(id, userId) {
 
 async function createReply(commentId, userId, content) {
   const parentComment = await commentsRepository.getCommentById(commentId);
-  if (parentComment.userId !== userId) return null;
+  if (!parentComment) return null;
 
   const reply = await commentsRepository.createReply(
     parentComment.tweetId,

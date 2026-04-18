@@ -18,7 +18,7 @@ async function getNotifications(request, response, next) {
     if (result === 'forbidden') {
       throw errorResponder(
         errorTypes.FORBIDDEN,
-        'Anda tidak memiliki akses ke notifikasi ini'
+        'You do not have access to these notifications'
       );
     }
 

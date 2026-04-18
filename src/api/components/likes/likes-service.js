@@ -1,5 +1,7 @@
 const likesRepository = require('./likes-repository');
 const { Users, Tweets } = require('../../../models');
+// untuk endpoint notifications
+const notificationsRepository = require('../notifications/notifications-repository');
 
 async function likeTweet(tweetId, userId) {
   const tweet = await likesRepository.findTweetByTweetId(tweetId);
@@ -17,6 +19,16 @@ async function likeTweet(tweetId, userId) {
 
   const like = await likesRepository.createLike(tweetId, userId);
   const totalLikes = await likesRepository.countLikesByTweetId(tweetId);
+
+  // untuk endpoint notifications
+  if (tweet.userId && tweet.userId.toString() !== userId.toString()) {
+    await notificationsRepository.createNotification(
+      tweet.userId,
+      userId,
+      'like',
+      tweetId
+    );
+  }
 
   return {
     message: 'You liked this tweet',
