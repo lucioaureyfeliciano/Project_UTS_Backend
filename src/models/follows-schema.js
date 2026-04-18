@@ -1,19 +1,19 @@
 module.exports = (db) =>
   db.model(
-    'Retweets',
+    'Follows',
     db.Schema(
       {
-        tweetId: {
+        followerId: {
           type: String,
           required: true,
         },
 
-        userId: {
+        followingId: {
           type: String,
           required: true,
         },
 
-        retweetedAt: {
+        followedAt: {
           type: Date,
           default: Date.now,
         },
