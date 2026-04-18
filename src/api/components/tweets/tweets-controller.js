@@ -16,12 +16,12 @@ async function createTweet(request, response, next) {
       );
     }
 
-    if (!user || !user.id) {
+    if (!user || !user.userId) {
       throw errorResponder(errorTypes.UNAUTHORIZED, 'User not authenticated');
     }
 
     // Create tweet via service
-    const tweet = await tweetsService.createTweet(user.id, user.username, text);
+    const tweet = await tweetsService.createTweet(user.userId, user.username, text);
 
     return response.status(201).json(tweet);
   } catch (error) {
