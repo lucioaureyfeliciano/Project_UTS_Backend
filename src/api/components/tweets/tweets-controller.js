@@ -21,7 +21,11 @@ async function createTweet(request, response, next) {
     }
 
     // Create tweet via service
-    const tweet = await tweetsService.createTweet(user.userId, user.username, text);
+    const tweet = await tweetsService.createTweet(
+      user.userId,
+      user.username,
+      text
+    );
 
     return response.status(201).json(tweet);
   } catch (error) {
