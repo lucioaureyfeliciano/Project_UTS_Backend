@@ -45,7 +45,7 @@ module.exports = (db) => {
 
   schema.set('toJSON', {
     transform(doc, ret) {
-      const { _id, __v, password, ...cleanRet } = ret;
+      const { _id, __v, ...cleanRet } = ret;
       return cleanRet;
     },
   });
