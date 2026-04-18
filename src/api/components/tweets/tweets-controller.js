@@ -1,5 +1,5 @@
-const tweetsService = require('./tweets-service');
-const { errorResponder, errorTypes } = require('../../../core/errors');
+const tweetsService = require("./tweets-service");
+const { errorResponder, errorTypes } = require("../../../core/errors");
 
 async function createTweet(request, response, next) {
   try {
@@ -12,16 +12,20 @@ async function createTweet(request, response, next) {
     if (!text) {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
-        'Tweet text is required'
+        "Tweet text is required",
       );
     }
 
-    if (!user || !user.id) {
-      throw errorResponder(errorTypes.UNAUTHORIZED, 'User not authenticated');
+    if (!user || !user.userId) {
+      throw errorResponder(errorTypes.UNAUTHORIZED, "User not authenticated");
     }
 
     // Create tweet via service
-    const tweet = await tweetsService.createTweet(user.id, user.username, text);
+    const tweet = await tweetsService.createTweet(
+      user.userId,
+      user.username,
+      text,
+    );
 
     return response.status(201).json(tweet);
   } catch (error) {
