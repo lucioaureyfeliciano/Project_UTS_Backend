@@ -1,19 +1,19 @@
 module.exports = (db) =>
   db.model(
-    "Bookmarks",
+    'Bookmarks',
     db.Schema(
       {
         userId: {
           type: db.Schema.Types.ObjectId,
-          ref: "Users",
+          ref: 'Users',
           required: true,
         },
         tweetId: {
           type: db.Schema.Types.ObjectId,
-          ref: "Tweets",
+          ref: 'Tweets',
           required: true,
         },
       },
-      { timestamps: true },
-    ),
+      { timestamps: true }
+    )
   );

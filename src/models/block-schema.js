@@ -2,52 +2,40 @@ const crypto = require('crypto');
 
 module.exports = (db) => {
   const schema = db.Schema({
-    tweetId: {
+    blockId: {
       type: String,
       unique: true,
     },
-
+    // user yang melakukan block
     userId: {
       type: String,
       required: true,
     },
-
-    username: {
+    // user yang diblokir
+    blockedId: {
       type: String,
       required: true,
     },
-
-    text: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
     createdAt: {
       type: Date,
       default: Date.now,
     },
   });
 
-  // AUTO GENERATE tweetId
-  schema.pre('save', function saveTweetId(next) {
-    if (!this.tweetId) {
+  // AUTO GENERATE blk_xxx
+  schema.pre('save', function saveBlockId(next) {
+    if (!this.blockId) {
       const random = crypto.randomBytes(3).toString('hex');
-      this.tweetId = `tw_${random}`;
+      this.blockId = `blk_${random}`;
     }
     next();
   });
 
   schema.set('toJSON', {
     transform(doc, ret) {
-      const { _id, __v, tweetId, ...rest } = ret;
-
-      return {
-        tweetId,
-        ...rest,
-      };
+      const { _id, __v, ...cleanRet } = ret;
+      return cleanRet;
     },
   });
-
-  return db.model('Tweets', schema);
+  return db.model('Blocks', schema);
 };

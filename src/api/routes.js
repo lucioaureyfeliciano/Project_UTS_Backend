@@ -1,12 +1,14 @@
-const express = require("express");
+const express = require('express');
 
-const users = require("./components/users/users-route");
-const comments = require("./components/comments/comments-route.js");
-const bookmarks = require("./components/bookmarks/bookmarks-route.js");
-const notifications = require("./components/notifications/notifications-route.js");
-const auth = require("./components/auth/auth-route");
-const tweets = require("./components/tweets/tweets-route");
-const repost = require("./components/repost/repost-route");
+const users = require('./components/users/users-route');
+const comments = require('./components/comments/comments-route');
+const bookmarks = require('./components/bookmarks/bookmarks-route');
+const notifications = require('./components/notifications/notifications-route');
+const auth = require('./components/auth/auth-route');
+const tweets = require('./components/tweets/tweets-route');
+const repost = require('./components/repost/repost-route');
+const block = require('./components/block/block-route');
+const mute = require('./components/mute/mute-route');
 
 module.exports = () => {
   const app = express.Router();
@@ -18,6 +20,8 @@ module.exports = () => {
   auth(app);
   tweets(app);
   repost(app);
+  block(app);
+  mute(app);
 
   return app;
 };
