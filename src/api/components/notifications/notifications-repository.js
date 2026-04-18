@@ -1,13 +1,13 @@
-const { Notifications } = require("../../../models");
+const { Notifications } = require('../../../models');
 
 async function getNotifications(userId, filter) {
   const query = { userId };
 
   if (filter.type) query.type = filter.type;
-  if (filter.status === "unread") query.isRead = false;
+  if (filter.status === 'unread') query.isRead = false;
 
   return Notifications.find(query)
-    .populate("actorId", "username")
+    .populate('actorId', 'username')
     .sort({ createdAt: -1 });
 }
 
@@ -19,7 +19,7 @@ async function markAsRead(notifId, userId) {
   return Notifications.findOneAndUpdate(
     { _id: notifId, userId },
     { isRead: true },
-    { new: true },
+    { new: true }
   );
 }
 
