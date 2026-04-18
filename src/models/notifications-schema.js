@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+const crypto = require('crypto');
 module.exports = (db) => {
   const schema = db.Schema({
     notifId: {
@@ -18,7 +18,7 @@ module.exports = (db) => {
 
     type: {
       type: String,
-      enum: ["like", "comment", "follow", "repost"],
+      enum: ['like', 'comment', 'follow', 'repost'],
       required: true,
     },
 
@@ -39,20 +39,20 @@ module.exports = (db) => {
   });
 
   // AUTO GENERATE notifId
-  schema.pre("save", function (next) {
+  schema.pre('save', function (next) {
     if (!this.notifId) {
-      const random = crypto.randomBytes(3).toString("hex");
+      const random = crypto.randomBytes(3).toString('hex');
       this.notifId = `notif_${random}`;
     }
     next();
   });
 
-  schema.set("toJSON", {
+  schema.set('toJSON', {
     transform: function (doc, ret) {
       delete ret._id;
       delete ret.__v;
     },
   });
 
-  return db.model("Notifications", schema);
+  return db.model('Notifications', schema);
 };

@@ -1,4 +1,4 @@
-const { Tweets } = require("../../../models");
+const { Tweets } = require('../../../models');
 
 async function createTweet(userId, username, text) {
   return Tweets.create({

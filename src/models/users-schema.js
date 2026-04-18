@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+const crypto = require('crypto');
 module.exports = (db) => {
   const schema = db.Schema({
     userId: {
@@ -11,19 +11,19 @@ module.exports = (db) => {
   });
 
   // AUTO GENERATE usr_xxx
-  schema.pre("save", function (next) {
+  schema.pre('save', function (next) {
     if (!this.userId) {
-      const random = crypto.randomBytes(3).toString("hex");
+      const random = crypto.randomBytes(3).toString('hex');
       this.userId = `usr_${random}`;
     }
     next();
   });
 
-  schema.set("toJSON", {
+  schema.set('toJSON', {
     transform(doc, ret) {
       const { _id, __v, password, ...cleanRet } = ret;
       return cleanRet;
     },
   });
-  return db.model("Users", schema);
+  return db.model('Users', schema);
 };

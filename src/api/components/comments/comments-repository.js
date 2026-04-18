@@ -1,15 +1,15 @@
-const { Comments } = require("../../../models");
+const { Comments } = require('../../../models');
 
 // ambil semua komentar untuk sebuah tweet
 async function getCommentsByTweetId(tweetId) {
   return Comments.find({ tweetId, parentId: null })
-    .populate("userId", "username")
+    .populate('userId', 'username')
     .sort({ createdAt: -1 });
 }
 
 // ambil sebuah komentar berdasarkan id
 async function getCommentById(id) {
-  return Comments.findById(id).populate("userId", "username");
+  return Comments.findById(id).populate('userId', 'username');
 }
 
 // buat komentar baru
@@ -20,8 +20,8 @@ async function createComment(tweetId, userId, content) {
 // edit komentar
 async function updateComment(id, content) {
   return Comments.findByIdAndUpdate(id, { content }, { new: true }).populate(
-    "userId",
-    "username",
+    'userId',
+    'username'
   );
 }
 
@@ -38,7 +38,7 @@ async function createReply(tweetId, parentId, userId, content) {
 // ambil semua reply dari komentar tertentu
 async function getRepliesByCommentId(parentId) {
   return Comments.find({ parentId })
-    .populate("userId", "username")
+    .populate('userId', 'username')
     .sort({ createdAt: 1 });
 }
 

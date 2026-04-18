@@ -1,5 +1,5 @@
-const commentsRepository = require("./comments-repository");
-const notificationsRepository = require("../notifications/notifications-repository");
+const commentsRepository = require('./comments-repository');
+const notificationsRepository = require('../notifications/notifications-repository');
 
 async function getCommentsByTweetId(tweetId) {
   const comments = await commentsRepository.getCommentsByTweetId(tweetId);
@@ -10,7 +10,7 @@ async function createComment(tweetId, userId, content, tweetOwnerId) {
   const comment = await commentsRepository.createComment(
     tweetId,
     userId,
-    content,
+    content
   );
 
   // kirim notifikasi ke pemilik tweet (kalau bukan diri sendiri)
@@ -18,8 +18,8 @@ async function createComment(tweetId, userId, content, tweetOwnerId) {
     await notificationsRepository.createNotification(
       tweetOwnerId,
       userId,
-      "comment",
-      tweetId,
+      'comment',
+      tweetId
     );
   }
 
@@ -31,7 +31,7 @@ async function updateComment(id, userId, content) {
   if (!comment) return null;
 
   // hanya pemilik komentar yang boleh edit
-  if (comment.userId.id !== userId) return "forbidden";
+  if (comment.userId.id !== userId) return 'forbidden';
 
   return commentsRepository.updateComment(id, content);
 }
@@ -41,7 +41,7 @@ async function deleteComment(id, userId) {
   if (!comment) return null;
 
   // hanya pemilik komentar yang boleh hapus
-  if (comment.userId.id !== userId) return "forbidden";
+  if (comment.userId.id !== userId) return 'forbidden';
 
   await commentsRepository.deleteComment(id);
   return true;
@@ -54,7 +54,7 @@ async function createReply(commentId, userId, content) {
     parentComment.tweetId,
     commentId,
     userId,
-    content,
+    content
   );
 
   // kirim notifikasi ke pemilik komentar (kalau bukan diri sendiri)
@@ -62,8 +62,8 @@ async function createReply(commentId, userId, content) {
     await notificationsRepository.createNotification(
       parentComment.userId.id,
       userId,
-      "comment",
-      parentComment.tweetId,
+      'comment',
+      parentComment.tweetId
     );
   }
 

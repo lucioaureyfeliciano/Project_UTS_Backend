@@ -1,13 +1,13 @@
-const bookmarksService = require("./bookmarks-service");
-const { errorResponder, errorTypes } = require("../../../core/errors");
+const bookmarksService = require('./bookmarks-service');
+const { errorResponder, errorTypes } = require('../../../core/errors');
 
 function handleForbiddenOrNotFound(result, next) {
-  if (result === "forbidden") {
+  if (result === 'forbidden') {
     return next(
       errorResponder(
         errorTypes.FORBIDDEN,
-        "Anda tidak memiliki akses ke bookmark ini",
-      ),
+        'Anda tidak memiliki akses ke bookmark ini'
+      )
     );
   }
   return null;
@@ -18,7 +18,7 @@ async function getBookmarks(request, response, next) {
   try {
     const result = await bookmarksService.getBookmarks(
       request.params.id,
-      request.user.id,
+      request.user.id
     );
 
     if (handleForbiddenOrNotFound(result, next)) return null;
@@ -34,35 +34,35 @@ async function addBookmark(request, response, next) {
     const { tweetId } = request.body;
 
     if (!tweetId) {
-      throw errorResponder(errorTypes.VALIDATION_ERROR, "Tweet ID is required");
+      throw errorResponder(errorTypes.VALIDATION_ERROR, 'Tweet ID is required');
     }
 
     const result = await bookmarksService.addBookmark(
       request.params.id,
       tweetId,
-      request.user.id,
+      request.user.id
     );
 
     if (handleForbiddenOrNotFound(result, next)) return null;
 
     // Cek apakah sudah di-bookmark
-    if (result === "already_bookmarked") {
+    if (result === 'already_bookmarked') {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
-        "Tweet already bookmarked",
+        'Tweet already bookmarked'
       );
     }
 
     if (!result) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
-        "Failed to add bookmark",
+        'Failed to add bookmark'
       );
     }
 
     return response
       .status(201)
-      .json({ message: "Bookmark added successfully", result });
+      .json({ message: 'Bookmark added successfully', result });
   } catch (error) {
     return next(error);
   }
@@ -74,21 +74,21 @@ async function removeBookmark(request, response, next) {
     const result = await bookmarksService.removeBookmark(
       request.params.id,
       request.params.tweet_id,
-      request.user.id,
+      request.user.id
     );
 
     if (handleForbiddenOrNotFound(result, next)) return null;
 
-    if (result === "not_found") {
+    if (result === 'not_found') {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
-        "Bookmark not found",
+        'Bookmark not found'
       );
     }
 
     return response
       .status(200)
-      .json({ message: "Bookmark removed successfully" });
+      .json({ message: 'Bookmark removed successfully' });
   } catch (error) {
     return next(error);
   }
@@ -99,12 +99,12 @@ async function clearBookmarks(request, response, next) {
   try {
     const result = await bookmarksService.clearBookmarks(
       request.params.id,
-      request.user.id,
+      request.user.id
     );
 
     if (handleForbiddenOrNotFound(result, next)) return null;
 
-    return response.status(200).json({ message: "All bookmarks cleared" });
+    return response.status(200).json({ message: 'All bookmarks cleared' });
   } catch (error) {
     return next(error);
   }
@@ -116,7 +116,7 @@ async function checkBookmark(request, response, next) {
     const result = await bookmarksService.checkBookmark(
       request.params.id,
       request.params.tweet_id,
-      request.user.id,
+      request.user.id
     );
 
     if (handleForbiddenOrNotFound(result, next)) return null;
@@ -131,7 +131,7 @@ async function countBookmarks(request, response, next) {
   try {
     const result = await bookmarksService.countBookmarks(
       request.params.id,
-      request.user.id,
+      request.user.id
     );
 
     if (handleForbiddenOrNotFound(result, next)) return null;

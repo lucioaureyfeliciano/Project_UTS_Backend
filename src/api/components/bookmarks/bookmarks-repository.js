@@ -1,7 +1,7 @@
-const { Bookmarks } = require("../../../models");
+const { Bookmarks } = require('../../../models');
 
 async function getBookmarksByUserId(userId) {
-  return Bookmarks.find({ userId }).populate("tweetId").sort({ createdAt: -1 });
+  return Bookmarks.find({ userId }).populate('tweetId').sort({ createdAt: -1 });
 }
 
 async function findBookmark(userId, tweetId) {

@@ -1,7 +1,7 @@
-const notificationsRepository = require("./notifications-repository");
+const notificationsRepository = require('./notifications-repository');
 
 async function getNotifications(userId, requesterId, filter) {
-  if (userId !== requesterId) return "forbidden";
+  if (userId !== requesterId) return 'forbidden';
   return notificationsRepository.getNotifications(userId, filter);
 }
 
@@ -12,28 +12,28 @@ async function createNotification(userId, actorId, type, tweetId) {
     userId,
     actorId,
     type,
-    tweetId,
+    tweetId
   );
 }
 async function markAsRead(userId, notifId, requesterId) {
-  if (userId !== requesterId) return "forbidden";
+  if (userId !== requesterId) return 'forbidden';
   const result = await notificationsRepository.markAsRead(notifId, userId);
   if (!result) return null;
   return result;
 }
 
 async function deleteNotification(userId, notifId, requesterId) {
-  if (userId !== requesterId) return "forbidden";
+  if (userId !== requesterId) return 'forbidden';
   const result = await notificationsRepository.deleteNotification(
     notifId,
-    userId,
+    userId
   );
   if (!result) return null;
   return true;
 }
 
 async function getUnreadCount(userId, requesterId) {
-  if (userId !== requesterId) return "forbidden";
+  if (userId !== requesterId) return 'forbidden';
 
   const count = await notificationsRepository.countUnreadNotifications(userId);
 

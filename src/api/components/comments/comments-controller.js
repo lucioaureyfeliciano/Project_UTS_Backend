@@ -1,15 +1,16 @@
-const commentsService = require("./comments-service");
-const { errorResponder, errorTypes } = require("../../../core/errors");
+const commentsService = require('./comments-service');
+const { errorResponder, errorTypes } = require('../../../core/errors');
+const Comments = require('./comments-service');
 
 // GET /tweets/:id/comments -> ambil semua komentar tweet
 async function getCommentsByTweetId(tweetId) {
   return Comments.find({ tweetId, parentId: null })
-    .populate("userId", "username")
+    .populate('userId', 'username')
     .sort({ createdAt: -1 });
 }
 
 async function getCommentById(id) {
-  return Comments.findOne({ commentId: id }).populate("userId", "username");
+  return Comments.findOne({ commentId: id }).populate('userId', 'username');
 }
 
 // POST /tweets/:id/comments -> buat komentar (harus login)
@@ -21,7 +22,7 @@ async function createComment(request, response, next) {
     if (!content) {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
-        "Field content is required",
+        'Field content is required'
       );
     }
 
@@ -29,19 +30,19 @@ async function createComment(request, response, next) {
       request.params.id,
       userId,
       content,
-      tweetOwnerId,
+      tweetOwnerId
     );
 
     if (!comment) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
-        "Failed to create comment",
+        'Failed to create comment'
       );
     }
 
     return response
       .status(201)
-      .json({ message: "Comment created successfully", comment });
+      .json({ message: 'Comment created successfully', comment });
   } catch (error) {
     return next(error);
   }
@@ -57,36 +58,36 @@ async function updateComment(request, response, next) {
     if (!comment) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
-        "Comment not found",
+        'Comment not found'
       );
     }
 
     if (!content) {
-      throw errorResponder(errorTypes.VALIDATION_ERROR, "Content is required");
+      throw errorResponder(errorTypes.VALIDATION_ERROR, 'Content is required');
     }
 
     const result = await commentsService.updateComment(
       request.params.id,
       userId,
-      content,
+      content
     );
 
     if (result === null) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
-        "Failed to update comment",
+        'Failed to update comment'
       );
     }
-    if (result === "forbidden") {
+    if (result === 'forbidden') {
       throw errorResponder(
         errorTypes.FORBIDDEN,
-        "You are not the owner of this comment",
+        'You are not the owner of this comment'
       );
     }
 
     return response
       .status(200)
-      .json({ message: "Comment updated successfully", result });
+      .json({ message: 'Comment updated successfully', result });
   } catch (error) {
     return next(error);
   }
@@ -98,25 +99,25 @@ async function deleteComment(request, response, next) {
     const userId = request.user.id;
     const result = await commentsService.deleteComment(
       request.params.id,
-      userId,
+      userId
     );
 
     if (result === null) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
-        "Comment not found",
+        'Comment not found'
       );
     }
-    if (result === "forbidden") {
+    if (result === 'forbidden') {
       throw errorResponder(
         errorTypes.FORBIDDEN,
-        "You are not the owner of this comment",
+        'You are not the owner of this comment'
       );
     }
 
     return response
       .status(200)
-      .json({ message: "Comment deleted successfully" });
+      .json({ message: 'Comment deleted successfully' });
   } catch (error) {
     return next(error);
   }
@@ -131,18 +132,18 @@ async function createReply(request, response, next) {
     if (!content) {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
-        "Field content wajib diisi",
+        'Field content wajib diisi'
       );
     }
 
     const reply = await commentsService.createReply(
       request.params.id,
       userId,
-      content,
+      content
     );
 
     if (!reply) {
-      throw errorResponder(errorTypes.NOT_FOUND, "Komentar tidak ditemukan");
+      throw errorResponder(errorTypes.NOT_FOUND, 'Komentar tidak ditemukan');
     }
 
     return response.status(201).json(reply);
@@ -155,7 +156,7 @@ async function createReply(request, response, next) {
 async function getRepliesByCommentId(request, response, next) {
   try {
     const result = await commentsService.getRepliesByCommentId(
-      request.params.id,
+      request.params.id
     );
     return response.status(200).json(result);
   } catch (error) {
@@ -167,7 +168,7 @@ async function getRepliesByCommentId(request, response, next) {
 async function countCommentsByTweetId(request, response, next) {
   try {
     const result = await commentsService.countCommentsByTweetId(
-      request.params.id,
+      request.params.id
     );
     return response.status(200).json(result);
   } catch (error) {
@@ -177,6 +178,7 @@ async function countCommentsByTweetId(request, response, next) {
 
 module.exports = {
   getCommentsByTweetId,
+  getCommentById,
   createComment,
   updateComment,
   deleteComment,
