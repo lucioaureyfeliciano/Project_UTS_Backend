@@ -1,7 +1,6 @@
 const messagesRepository = require('./messages-repository');
 const usersRepository = require('../users/users-repository');
 
-// 🔥 helper attach username
 async function attachUserInfo(message) {
   const sender = await usersRepository.getUserById(message.senderId);
   const receiver = await usersRepository.getUserById(message.receiverId);
@@ -22,7 +21,6 @@ async function attachUserInfo(message) {
   };
 }
 
-// 🔒 helper ownership
 async function getOwnedMessage(messageId, userId) {
   const message = await messagesRepository.getMessageByMessageId(messageId);
 
@@ -37,7 +35,6 @@ async function getOwnedMessage(messageId, userId) {
   return message;
 }
 
-// 📤 SEND
 async function sendMessage(senderId, receiverId, text) {
   if (senderId === receiverId) {
     throw new Error('Cannot send message to yourself');
@@ -56,7 +53,6 @@ async function sendMessage(senderId, receiverId, text) {
   return attachUserInfo(message);
 }
 
-// 💬 GET CHAT
 async function getMessages(currentUserId, otherUserId) {
   await messagesRepository.markAsRead(currentUserId, otherUserId);
 
@@ -68,7 +64,6 @@ async function getMessages(currentUserId, otherUserId) {
   return Promise.all(messages.map(attachUserInfo));
 }
 
-// 📥 INBOX
 async function getInbox(userId) {
   const messages = await messagesRepository.getAllUserMessages(userId);
 
@@ -99,7 +94,6 @@ async function getInbox(userId) {
   return Object.values(map);
 }
 
-// ✏️ UPDATE
 async function updateMessage(messageId, userId, text) {
   if (!text || text.trim() === '') {
     throw new Error('Text is required');
@@ -115,7 +109,6 @@ async function updateMessage(messageId, userId, text) {
   return attachUserInfo(updated);
 }
 
-// 🗑️ DELETE
 async function deleteMessage(messageId, userId) {
   await getOwnedMessage(messageId, userId);
 

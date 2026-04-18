@@ -9,7 +9,6 @@ async function getTrendingHashtags() {
     const matches = tweet.text.match(/#[a-zA-Z0-9_]+/g);
 
     if (matches) {
-      // 🔥 hindari duplikat dalam 1 tweet
       const uniqueTags = [...new Set(matches.map((tag) => tag.toLowerCase()))];
 
       uniqueTags.forEach((tag) => {
@@ -23,10 +22,8 @@ async function getTrendingHashtags() {
     count: hashtagCount[tag],
   }));
 
-  // urutkan dari terbesar
   result.sort((a, b) => b.count - a.count);
 
-  // ambil top 10
   return result.slice(0, 10);
 }
 

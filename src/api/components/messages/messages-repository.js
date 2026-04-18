@@ -1,11 +1,9 @@
 const { Messages } = require('../../../models');
 
-// 📤 CREATE
 async function createMessage(data) {
   return Messages.create(data);
 }
 
-// 💬 CHAT
 async function getMessages(currentUserId, otherUserId) {
   return Messages.find({
     $or: [
@@ -15,14 +13,12 @@ async function getMessages(currentUserId, otherUserId) {
   }).sort({ createdAt: 1 });
 }
 
-// 📥 INBOX BASE DATA
 async function getAllUserMessages(userId) {
   return Messages.find({
     $or: [{ senderId: userId }, { receiverId: userId }],
   }).sort({ createdAt: -1 });
 }
 
-// 👁️ MARK AS READ
 async function markAsRead(currentUserId, otherUserId) {
   return Messages.updateMany(
     {
@@ -36,12 +32,10 @@ async function markAsRead(currentUserId, otherUserId) {
   );
 }
 
-// 🔍 GET BY messageId
 async function getMessageByMessageId(messageId) {
   return Messages.findOne({ messageId });
 }
 
-// ✏️ UPDATE
 async function updateMessage(messageId, data) {
   return Messages.findOneAndUpdate(
     { messageId },
@@ -50,7 +44,6 @@ async function updateMessage(messageId, data) {
   );
 }
 
-// 🗑️ DELETE
 async function deleteMessage(messageId) {
   return Messages.findOneAndDelete({ messageId });
 }

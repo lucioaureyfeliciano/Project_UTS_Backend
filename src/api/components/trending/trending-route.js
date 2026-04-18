@@ -8,6 +8,6 @@ module.exports = (app) => {
   // prefix /trending
   app.use('/trending', route);
 
-  // GET /trending
+  // Get trending hashtags based on tweet text
   route.get('/', trendingController.getTrending);
 };
