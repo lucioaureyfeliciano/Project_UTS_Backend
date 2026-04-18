@@ -7,6 +7,8 @@ const notifications = require('./components/notifications/notifications-route.js
 const auth = require('./components/auth/auth-route');
 const tweets = require('./components/tweets/tweets-route');
 const repost = require('./components/repost/repost-route');
+const block = require('./components/block/block-route');
+const mute = require('./components/mute/mute-route');
 const messages = require('./components/messages/messages-route');
 const dislikes = require('./components/dislikes/dislikes-route');
 const trending = require('./components/reports/trending-route');
@@ -24,6 +26,8 @@ module.exports = () => {
   repost(app);
   dislikes(app);
   trending(app);
+  block(app);
+  mute(app);
 
   return app;
 };
