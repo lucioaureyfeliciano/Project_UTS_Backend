@@ -42,9 +42,9 @@ async function followUser(targetUserId, currentUserId) {
   return {
     message: 'Followed successfully',
     data: {
-      WhoFollow: followerUser.username,
+      WhoFollow: followerUser.username, // Siapa yang ngefollow
       followerId: currentUserId,
-      followWho: followingUser.username,
+      followWho: followingUser.username, // Siapa yang difollow
       followingId: targetUserId,
       followedAt: follow.followedAt,
     },
