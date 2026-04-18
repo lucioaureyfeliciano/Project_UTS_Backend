@@ -44,7 +44,7 @@ module.exports = (db) => {
   );
 
   // AUTO GENERATE tweetId
-  schema.pre('save', function (next) {
+  schema.pre('save', function saveTweetId(next) {
     if (!this.tweetId) {
       const random = crypto.randomBytes(3).toString('hex');
       this.tweetId = `tw_${random}`;
