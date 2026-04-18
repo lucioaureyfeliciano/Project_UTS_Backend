@@ -1,24 +1,30 @@
 const { Messages } = require('../../../models');
 
-async function createMessage(senderId, receiverId, text) {
-  return Messages.create({
-    senderId,
-    receiverId,
-    text,
-  });
+// 📤 CREATE
+async function createMessage(data) {
+  return Messages.create(data);
 }
 
-async function getMessages(userA, userB) {
+// 💬 CHAT
+async function getMessages(currentUserId, otherUserId) {
   return Messages.find({
     $or: [
-      { senderId: userA, receiverId: userB },
-      { senderId: userB, receiverId: userA },
+      { senderId: currentUserId, receiverId: otherUserId },
+      { senderId: otherUserId, receiverId: currentUserId },
     ],
-  }).sort({ createdAt: 1 }); // urut dari lama ke baru
+  }).sort({ createdAt: 1 });
 }
 
+// 📥 INBOX BASE DATA
+async function getAllUserMessages(userId) {
+  return Messages.find({
+    $or: [{ senderId: userId }, { receiverId: userId }],
+  }).sort({ createdAt: -1 });
+}
+
+// 👁️ MARK AS READ
 async function markAsRead(currentUserId, otherUserId) {
-  const result = await Messages.updateMany(
+  return Messages.updateMany(
     {
       senderId: otherUserId,
       receiverId: currentUserId,
@@ -28,21 +34,33 @@ async function markAsRead(currentUserId, otherUserId) {
       $set: { isRead: true },
     }
   );
-
-  console.log('RESULT:', result);
-
-  return result;
 }
 
-async function getAllUserMessages(userId) {
-  return Messages.find({
-    $or: [{ senderId: userId }, { receiverId: userId }],
-  }).sort({ createdAt: -1 }); // terbaru dulu
+// 🔍 GET BY messageId
+async function getMessageByMessageId(messageId) {
+  return Messages.findOne({ messageId });
+}
+
+// ✏️ UPDATE
+async function updateMessage(messageId, data) {
+  return Messages.findOneAndUpdate(
+    { messageId },
+    { $set: data },
+    { new: true }
+  );
+}
+
+// 🗑️ DELETE
+async function deleteMessage(messageId) {
+  return Messages.findOneAndDelete({ messageId });
 }
 
 module.exports = {
   createMessage,
   getMessages,
-  markAsRead,
   getAllUserMessages,
+  markAsRead,
+  getMessageByMessageId,
+  updateMessage,
+  deleteMessage,
 };

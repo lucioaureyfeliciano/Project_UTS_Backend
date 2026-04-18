@@ -3,10 +3,9 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
 
 async function sendMessage(request, response, next) {
   try {
-    const senderId = request.user.id; // dari token
+    const senderId = request.user.userId;
     const { receiverId, text } = request.body;
 
-    // validasi
     if (!receiverId) {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
@@ -21,7 +20,6 @@ async function sendMessage(request, response, next) {
       );
     }
 
-    // kirim ke service
     const message = await messagesService.sendMessage(
       senderId,
       receiverId,
@@ -36,7 +34,7 @@ async function sendMessage(request, response, next) {
 
 async function getMessages(request, response, next) {
   try {
-    const currentUserId = request.user.id;
+    const currentUserId = request.user.userId;
     const otherUserId = request.params.userId;
 
     if (!otherUserId) {
@@ -56,7 +54,7 @@ async function getMessages(request, response, next) {
 
 async function getInbox(request, response, next) {
   try {
-    const userId = request.user.id;
+    const { userId } = request.user;
 
     const inbox = await messagesService.getInbox(userId);
 
@@ -66,8 +64,50 @@ async function getInbox(request, response, next) {
   }
 }
 
+async function updateMessage(request, response, next) {
+  try {
+    const { userId } = request.user;
+    const { messageId } = request.params;
+    const { text } = request.body;
+
+    if (!text) {
+      throw errorResponder(
+        errorTypes.VALIDATION_ERROR,
+        'Message text is required'
+      );
+    }
+
+    const updatedMessage = await messagesService.updateMessage(
+      messageId,
+      userId,
+      text
+    );
+
+    return response.status(200).json(updatedMessage);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function deleteMessage(request, response, next) {
+  try {
+    const { userId } = request.user;
+    const { messageId } = request.params;
+
+    await messagesService.deleteMessage(messageId, userId);
+
+    return response.status(200).json({
+      message: 'Message deleted successfully',
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   sendMessage,
   getMessages,
   getInbox,
+  updateMessage,
+  deleteMessage,
 };

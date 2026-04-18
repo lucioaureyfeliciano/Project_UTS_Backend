@@ -1,56 +1,131 @@
 const messagesRepository = require('./messages-repository');
+const usersRepository = require('../users/users-repository');
 
+// 🔥 helper attach username
+async function attachUserInfo(message) {
+  const sender = await usersRepository.getUserById(message.senderId);
+  const receiver = await usersRepository.getUserById(message.receiverId);
+
+  const { senderId, receiverId, ...rest } = message.toObject();
+
+  return {
+    messageId: message.messageId,
+    sender: {
+      userId: sender.userId,
+      username: sender.username,
+    },
+    receiver: {
+      userId: receiver.userId,
+      username: receiver.username,
+    },
+    ...rest,
+  };
+}
+
+// 🔒 helper ownership
+async function getOwnedMessage(messageId, userId) {
+  const message = await messagesRepository.getMessageByMessageId(messageId);
+
+  if (!message) {
+    throw new Error('Message not found');
+  }
+
+  if (message.senderId !== userId) {
+    throw new Error('Unauthorized');
+  }
+
+  return message;
+}
+
+// 📤 SEND
 async function sendMessage(senderId, receiverId, text) {
-  // optional: tidak boleh kirim ke diri sendiri
   if (senderId === receiverId) {
     throw new Error('Cannot send message to yourself');
   }
 
-  return messagesRepository.createMessage(senderId, receiverId, text);
+  if (!text || text.trim() === '') {
+    throw new Error('Text is required');
+  }
+
+  const message = await messagesRepository.createMessage({
+    senderId,
+    receiverId,
+    text,
+  });
+
+  return attachUserInfo(message);
 }
 
+// 💬 GET CHAT
 async function getMessages(currentUserId, otherUserId) {
-  // update dulu
   await messagesRepository.markAsRead(currentUserId, otherUserId);
 
-  // baru ambil data
   const messages = await messagesRepository.getMessages(
     currentUserId,
     otherUserId
   );
 
-  return messages;
+  return Promise.all(messages.map(attachUserInfo));
 }
 
+// 📥 INBOX
 async function getInbox(userId) {
   const messages = await messagesRepository.getAllUserMessages(userId);
 
   const map = {};
 
-  messages.forEach((msg) => {
-    const otherUserId =
-      msg.senderId.toString() === userId
-        ? msg.receiverId.toString()
-        : msg.senderId.toString();
+  for (const msg of messages) {
+    const otherUserId = msg.senderId === userId ? msg.receiverId : msg.senderId;
 
-    if (!map[otherUserId]) {
+    if (
+      !map[otherUserId] ||
+      new Date(msg.createdAt) > new Date(map[otherUserId].lastMessage.createdAt)
+    ) {
+      const user = await usersRepository.getUserById(otherUserId);
+
       map[otherUserId] = {
+        userId: user.userId,
+        username: user.username,
         lastMessage: msg,
-        unreadCount: 0,
+        unreadCount: map[otherUserId]?.unreadCount || 0,
       };
     }
 
-    // hitung unread
-    if (msg.receiverId.toString() === userId && msg.isRead === false) {
+    if (msg.receiverId === userId && !msg.isRead) {
       map[otherUserId].unreadCount++;
     }
-  });
+  }
 
   return Object.values(map);
+}
+
+// ✏️ UPDATE
+async function updateMessage(messageId, userId, text) {
+  if (!text || text.trim() === '') {
+    throw new Error('Text is required');
+  }
+
+  await getOwnedMessage(messageId, userId);
+
+  const updated = await messagesRepository.updateMessage(messageId, {
+    text,
+    edited: true,
+  });
+
+  return attachUserInfo(updated);
+}
+
+// 🗑️ DELETE
+async function deleteMessage(messageId, userId) {
+  await getOwnedMessage(messageId, userId);
+
+  return messagesRepository.deleteMessage(messageId);
 }
 
 module.exports = {
   sendMessage,
   getMessages,
   getInbox,
+  updateMessage,
+  deleteMessage,
 };

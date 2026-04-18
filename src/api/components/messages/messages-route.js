@@ -7,12 +7,18 @@ const route = express.Router();
 module.exports = (app) => {
   app.use('/messages', route);
 
-  // Kirim DM
+  // 📥 inbox
+  route.get('/inbox', authMiddleware, messagesController.getInbox);
+
+  // 💬 chat dengan user
+  route.get('/chat/:userId', authMiddleware, messagesController.getMessages);
+
+  // 📤 kirim
   route.post('/', authMiddleware, messagesController.sendMessage);
 
-  // Ambil percakapan dengan user tertentu
-  route.get('/:userId', authMiddleware, messagesController.getMessages);
+  // ✏️ edit message
+  route.put('/:messageId', authMiddleware, messagesController.updateMessage);
 
-  // (Optional) Inbox
-  route.get('/', authMiddleware, messagesController.getInbox);
+  // 🗑️ delete message
+  route.delete('/:messageId', authMiddleware, messagesController.deleteMessage);
 };
