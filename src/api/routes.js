@@ -9,6 +9,7 @@ const tweets = require('./components/tweets/tweets-route');
 const repost = require('./components/repost/repost-route');
 const messages = require('./components/messages/messages-route');
 const dislikes = require('./components/dislikes/dislikes-route');
+const trending = require('./components/reports/trending-route');
 
 module.exports = () => {
   const app = express.Router();
@@ -22,6 +23,7 @@ module.exports = () => {
   messages(app);
   repost(app);
   dislikes(app);
+  trending(app);
 
   return app;
 };
