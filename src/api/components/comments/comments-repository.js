@@ -1,5 +1,10 @@
 const { Comments } = require('../../../models');
 
+// buat komentar baru
+async function createComment(tweetId, userId, content) {
+  return Comments.create({ tweetId, userId, content, parentId: null });
+}
+
 // ambil semua komentar untuk sebuah tweet
 async function getCommentsByTweetId(tweetId) {
   return Comments.find({ tweetId, parentId: null })
@@ -10,11 +15,6 @@ async function getCommentsByTweetId(tweetId) {
 // ambil sebuah komentar berdasarkan id
 async function getCommentById(id) {
   return Comments.findOne({ commentId: id }).populate('userId', 'username');
-}
-
-// buat komentar baru
-async function createComment(tweetId, userId, content) {
-  return Comments.create({ tweetId, userId, content, parentId: null });
 }
 
 // edit komentar
@@ -49,9 +49,9 @@ async function countCommentsByTweetId(tweetId) {
 }
 
 module.exports = {
+  createComment,
   getCommentsByTweetId,
   getCommentById,
-  createComment,
   updateComment,
   deleteComment,
   createReply,

@@ -1,11 +1,6 @@
 const commentsRepository = require('./comments-repository');
 const notificationsRepository = require('../notifications/notifications-repository');
 
-async function getCommentsByTweetId(tweetId) {
-  const comments = await commentsRepository.getCommentsByTweetId(tweetId);
-  return { tweetId, totalComments: comments.length, comments };
-}
-
 async function createComment(tweetId, userId, content, tweetOwnerId) {
   const comment = await commentsRepository.createComment(
     tweetId,
@@ -24,6 +19,15 @@ async function createComment(tweetId, userId, content, tweetOwnerId) {
   }
 
   return comment;
+}
+
+async function getCommentsByTweetId(tweetId) {
+  const comments = await commentsRepository.getCommentsByTweetId(tweetId);
+  return { tweetId, totalComments: comments.length, comments };
+}
+
+async function getCommentById(id) {
+  return commentsRepository.getCommentById(id);
 }
 
 async function updateComment(id, userId, content) {
@@ -46,6 +50,7 @@ async function deleteComment(id, userId) {
   await commentsRepository.deleteComment(id);
   return true;
 }
+
 async function createReply(commentId, userId, content) {
   const parentComment = await commentsRepository.getCommentById(commentId);
   if (parentComment.userId !== userId) return null;
@@ -75,22 +80,18 @@ async function getRepliesByCommentId(commentId) {
   return { commentId, totalReplies: replies.length, replies };
 }
 
-async function getComment(id) {
-  return commentsRepository.getCommentById(id);
-}
-
 async function countCommentsByTweetId(tweetId) {
   const count = await commentsRepository.countCommentsByTweetId(tweetId);
   return { tweetId, totalComments: count };
 }
 
 module.exports = {
-  getCommentsByTweetId,
   createComment,
+  getCommentsByTweetId,
+  getCommentById,
   updateComment,
   deleteComment,
   createReply,
   getRepliesByCommentId,
-  getComment,
   countCommentsByTweetId,
 };

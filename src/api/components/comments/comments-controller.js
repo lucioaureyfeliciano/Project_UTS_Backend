@@ -1,31 +1,6 @@
 const commentsService = require('./comments-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
-// GET /tweets/:id/comments -> ambil semua komentar tweet berdasarkan id tweet
-async function getCommentsByTweetId(request, response, next) {
-  try {
-    const result = await commentsService.getCommentsByTweetId(
-      request.params.id
-    );
-    return response.status(200).json(result);
-  } catch (error) {
-    return next(error);
-  }
-}
-
-// GET /comments/:id -> ambil sebuah komentar berdasarkan id komentar
-async function getCommentById(request, response, next) {
-  try {
-    const comment = await commentsService.getCommentById(request.params.id);
-    if (!comment) {
-      throw errorResponder(errorTypes.NOT_FOUND, 'Comment not found');
-    }
-    return response.status(200).json(comment);
-  } catch (error) {
-    return next(error);
-  }
-}
-
 // POST /tweets/:id/comments -> buat komentar (harus login)
 async function createComment(request, response, next) {
   try {
@@ -56,6 +31,31 @@ async function createComment(request, response, next) {
     return response
       .status(201)
       .json({ message: 'Comment created successfully', comment });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// GET /tweets/:id/comments -> ambil semua komentar tweet berdasarkan id tweet
+async function getCommentsByTweetId(request, response, next) {
+  try {
+    const result = await commentsService.getCommentsByTweetId(
+      request.params.id
+    );
+    return response.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// GET /comments/:id -> ambil sebuah komentar berdasarkan id komentar
+async function getCommentById(request, response, next) {
+  try {
+    const comment = await commentsService.getCommentById(request.params.id);
+    if (!comment) {
+      throw errorResponder(errorTypes.NOT_FOUND, 'Comment not found');
+    }
+    return response.status(200).json(comment);
   } catch (error) {
     return next(error);
   }
@@ -190,9 +190,9 @@ async function countCommentsByTweetId(request, response, next) {
 }
 
 module.exports = {
+  createComment,
   getCommentsByTweetId,
   getCommentById,
-  createComment,
   updateComment,
   deleteComment,
   createReply,
