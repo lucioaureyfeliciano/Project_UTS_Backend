@@ -1,19 +1,6 @@
 const commentsService = require('./comments-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
-const Comments = require('./comments-service');
 
-// GET /tweets/:id/comments -> ambil semua komentar tweet
-async function getCommentsByTweetId(tweetId) {
-  return Comments.find({ tweetId, parentId: null })
-    .populate('userId', 'username')
-    .sort({ createdAt: -1 });
-}
-
-async function getCommentById(id) {
-  return Comments.findOne({ commentId: id }).populate('userId', 'username');
-}
-
-// POST /tweets/:id/comments -> buat komentar (harus login)
 async function createComment(request, response, next) {
   try {
     const { content, tweetOwnerId } = request.body;
@@ -48,7 +35,29 @@ async function createComment(request, response, next) {
   }
 }
 
-// PUT  /comments/:id -> edit komentar (harus login)
+async function getCommentsByTweetId(request, response, next) {
+  try {
+    const result = await commentsService.getCommentsByTweetId(
+      request.params.id
+    );
+    return response.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function getCommentById(request, response, next) {
+  try {
+    const comment = await commentsService.getCommentById(request.params.id);
+    if (!comment) {
+      throw errorResponder(errorTypes.NOT_FOUND, 'Comment not found');
+    }
+    return response.status(200).json(comment);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function updateComment(request, response, next) {
   try {
     const { content } = request.body;
@@ -93,7 +102,6 @@ async function updateComment(request, response, next) {
   }
 }
 
-// DELETE /comments/:id -> hapus komentar (harus login)
 async function deleteComment(request, response, next) {
   try {
     const userId = request.user.id;
@@ -123,7 +131,6 @@ async function deleteComment(request, response, next) {
   }
 }
 
-// POST /api/comments/:id/replies
 async function createReply(request, response, next) {
   try {
     const { content } = request.body;
@@ -152,7 +159,6 @@ async function createReply(request, response, next) {
   }
 }
 
-// GET /api/comments/:id/replies
 async function getRepliesByCommentId(request, response, next) {
   try {
     const result = await commentsService.getRepliesByCommentId(
@@ -164,7 +170,6 @@ async function getRepliesByCommentId(request, response, next) {
   }
 }
 
-// GET /api/tweets/:id/comments/count
 async function countCommentsByTweetId(request, response, next) {
   try {
     const result = await commentsService.countCommentsByTweetId(
@@ -177,9 +182,9 @@ async function countCommentsByTweetId(request, response, next) {
 }
 
 module.exports = {
+  createComment,
   getCommentsByTweetId,
   getCommentById,
-  createComment,
   updateComment,
   deleteComment,
   createReply,

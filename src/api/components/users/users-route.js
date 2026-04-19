@@ -13,14 +13,14 @@ module.exports = (app) => {
   route.post('/', usersController.createUser);
 
   // Get user detail
-  route.get('/:id', usersController.getUser);
+  route.get('/:userId', usersController.getUser);
 
   // Update user
-  route.put('/:id', usersController.updateUser);
+  route.put('/:userId', usersController.updateUser);
 
   // Change password
-  route.put('/:id/change-password', usersController.changePassword);
+  route.put('/:userId/change-password', usersController.changePassword);
 
   // Delete user
-  route.delete('/:id', usersController.deleteUser);
+  route.delete('/:userId', usersController.deleteUser);
 };

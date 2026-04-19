@@ -1,16 +1,23 @@
 const bookmarksRepository = require('./bookmarks-repository');
 
-async function getBookmarks(userId, requesterId) {
-  if (userId !== requesterId) return 'forbidden';
-  return bookmarksRepository.getBookmarksByUserId(userId);
-}
-
 async function addBookmark(userId, tweetId, requesterId) {
   if (userId !== requesterId) return 'forbidden';
 
   const existing = await bookmarksRepository.findBookmark(userId, tweetId);
   if (existing) return 'already_bookmarked';
   return bookmarksRepository.createBookmark(userId, tweetId);
+}
+
+async function checkBookmark(userId, tweetId, requesterId) {
+  if (userId !== requesterId) return 'forbidden';
+
+  const existing = await bookmarksRepository.findBookmark(userId, tweetId);
+  return { isBookmarked: !!existing };
+}
+
+async function getBookmarks(userId, requesterId) {
+  if (userId !== requesterId) return 'forbidden';
+  return bookmarksRepository.getBookmarksByUserId(userId);
 }
 
 async function removeBookmark(userId, tweetId, requesterId) {
@@ -29,12 +36,6 @@ async function clearBookmarks(userId, requesterId) {
   return true;
 }
 
-async function checkBookmark(userId, tweetId, requesterId) {
-  if (userId !== requesterId) return 'forbidden';
-  const existing = await bookmarksRepository.findBookmark(userId, tweetId);
-  return { isBookmarked: !!existing };
-}
-
 async function countBookmarks(userId, requesterId) {
   if (userId !== requesterId) return 'forbidden';
   const count = await bookmarksRepository.countBookmarks(userId);
@@ -43,9 +44,9 @@ async function countBookmarks(userId, requesterId) {
 
 module.exports = {
   getBookmarks,
+  checkBookmark,
   addBookmark,
   removeBookmark,
   clearBookmarks,
-  checkBookmark,
   countBookmarks,
 };

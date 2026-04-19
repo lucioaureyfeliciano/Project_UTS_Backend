@@ -1,4 +1,7 @@
 const retweetsRepository = require('./repost-repository');
+const { Users } = require('../../../models');
+// untuk endpoint notifications
+const notificationsRepository = require('../notifications/notifications-repository');
 
 async function repostTweet(tweetId, userId) {
   // Cek apakah tweet asli ada
@@ -17,8 +20,19 @@ async function repostTweet(tweetId, userId) {
   }
 
   const repost = await retweetsRepository.createRepost(tweetId, userId);
+
+  // untuk endpoint notifications
+  if (tweet.userId && tweet.userId.toString() !== userId.toString()) {
+    await notificationsRepository.createNotification(
+      tweet.userId,
+      userId,
+      'repost',
+      tweetId
+    );
+  }
+
   return {
-    message: 'Is reposted:',
+    message: 'Tweet reposted successfully',
     data: {
       tweet: tweet.toJSON(),
       success: true,
@@ -58,10 +72,24 @@ async function getRepostsOfTweet(tweetId) {
   }
 
   const reposts = await retweetsRepository.getRepostsByTweetId(tweetId);
+
+  const result = await Promise.all(
+    reposts.map(async (r) => {
+      const user = await Users.findOne({ userId: r.userId });
+
+      return {
+        userId: r.userId,
+        username: user?.username || null,
+        retweetedAt: r.retweetedAt,
+      };
+    })
+  );
+
   return {
-    message: reposts.length ? 'Reposts retrieved!' : 'No reposts yet',
-    count: reposts.length,
-    data: reposts,
+    tweet: tweet.toJSON(),
+    message: result.length ? 'Has been reposted by' : 'No reposts yet',
+    count: result.length,
+    data: result,
   };
 }
 

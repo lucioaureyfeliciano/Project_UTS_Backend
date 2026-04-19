@@ -7,16 +7,16 @@ const route = express.Router({ mergeParams: true });
 module.exports = (app) => {
   app.use('/users/:id/notifications', route);
 
-  // GET /users/:id/notifications          -> ambil semua notifikasi user
+  // GET /users/:id/notifications -> ambil semua notifikasi user
   route.get('/', authMiddleware, notificationsController.getNotifications);
 
-  // GET /users/:id/notifications/unread   -> hitung notifikasi belum dibaca
+  // GET /users/:id/notifications/unread -> hitung notifikasi belum dibaca
   route.get('/unread', authMiddleware, notificationsController.getUnreadCount);
 
-  // POST /users/:id/notifications          -> buat notifikasi baru
+  // POST /users/:id/notifications -> buat notifikasi baru
   route.post('/', authMiddleware, notificationsController.createNotification);
 
-  // PUT    /users/:id/notifications/read     -> tandai semua sudah dibaca
+  // PUT    /users/:id/notifications/read -> tandai semua sudah dibaca
   route.put(
     '/:notif_id/read',
     authMiddleware,

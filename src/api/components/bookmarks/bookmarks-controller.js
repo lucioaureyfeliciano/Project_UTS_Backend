@@ -13,22 +13,6 @@ function handleForbiddenOrNotFound(result, next) {
   return null;
 }
 
-// GET /users/:id/bookmarks
-async function getBookmarks(request, response, next) {
-  try {
-    const result = await bookmarksService.getBookmarks(
-      request.params.id,
-      request.user.id
-    );
-
-    if (handleForbiddenOrNotFound(result, next)) return null;
-    return response.status(200).json(result);
-  } catch (error) {
-    return next(error);
-  }
-}
-
-// POST /users/:id/bookmarks
 async function addBookmark(request, response, next) {
   try {
     const { tweetId } = request.body;
@@ -40,7 +24,7 @@ async function addBookmark(request, response, next) {
     const result = await bookmarksService.addBookmark(
       request.params.id,
       tweetId,
-      request.user.id
+      request.user.userId
     );
 
     if (handleForbiddenOrNotFound(result, next)) return null;
@@ -68,13 +52,41 @@ async function addBookmark(request, response, next) {
   }
 }
 
-// DELETE /users/:id/bookmarks/:tweet_id
+async function checkBookmark(request, response, next) {
+  try {
+    const result = await bookmarksService.checkBookmark(
+      request.params.id,
+      request.params.tweet_id,
+      request.user.userId
+    );
+
+    if (handleForbiddenOrNotFound(result, next)) return null;
+    return response.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function getBookmarks(request, response, next) {
+  try {
+    const result = await bookmarksService.getBookmarks(
+      request.params.id,
+      request.user.userId
+    );
+
+    if (handleForbiddenOrNotFound(result, next)) return null;
+    return response.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function removeBookmark(request, response, next) {
   try {
     const result = await bookmarksService.removeBookmark(
       request.params.id,
       request.params.tweet_id,
-      request.user.id
+      request.user.userId
     );
 
     if (handleForbiddenOrNotFound(result, next)) return null;
@@ -94,12 +106,11 @@ async function removeBookmark(request, response, next) {
   }
 }
 
-// DELETE /users/:id/bookmarks
 async function clearBookmarks(request, response, next) {
   try {
     const result = await bookmarksService.clearBookmarks(
       request.params.id,
-      request.user.id
+      request.user.userId
     );
 
     if (handleForbiddenOrNotFound(result, next)) return null;
@@ -110,28 +121,11 @@ async function clearBookmarks(request, response, next) {
   }
 }
 
-// GET /api/users/:id/bookmarks/check/:tweet_id
-async function checkBookmark(request, response, next) {
-  try {
-    const result = await bookmarksService.checkBookmark(
-      request.params.id,
-      request.params.tweet_id,
-      request.user.id
-    );
-
-    if (handleForbiddenOrNotFound(result, next)) return null;
-    return response.status(200).json(result);
-  } catch (error) {
-    return next(error);
-  }
-}
-
-// GET /api/users/:id/bookmarks/count
 async function countBookmarks(request, response, next) {
   try {
     const result = await bookmarksService.countBookmarks(
       request.params.id,
-      request.user.id
+      request.user.userId
     );
 
     if (handleForbiddenOrNotFound(result, next)) return null;
@@ -142,10 +136,10 @@ async function countBookmarks(request, response, next) {
 }
 
 module.exports = {
-  getBookmarks,
   addBookmark,
+  checkBookmark,
+  getBookmarks,
   removeBookmark,
   clearBookmarks,
-  checkBookmark,
   countBookmarks,
 };

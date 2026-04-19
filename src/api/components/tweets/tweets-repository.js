@@ -1,4 +1,4 @@
-const { Tweets } = require('../../../models');
+const { Tweets, Likes, Retweets, Dislikes } = require('../../../models');
 
 async function createTweet(userId, username, text) {
   return Tweets.create({
@@ -9,10 +9,73 @@ async function createTweet(userId, username, text) {
 }
 
 async function getTweetByTweetId(tweetId) {
-  return Tweets.findOne({ tweetId });
+  const tweet = await Tweets.findOne({ tweetId });
+
+  if (!tweet) {
+    return {
+      error: 'NOT_FOUND',
+      message: 'Tweet not found',
+    };
+  }
+
+  const likesCount = await Likes.countDocuments({ tweetId });
+  const dislikesCount = await Dislikes.countDocuments({ tweetId });
+  const repostCount = await Retweets.countDocuments({ tweetId });
+  const commentsCount = await Comments.countDocuments({ tweetId });
+
+  return {
+    ...tweet.toJSON(),
+    likesCount,
+    dislikesCount,
+    repostCount,
+    commentsCount,
+  };
+}
+
+// hapus tweets tertentu
+async function deleteTweetByTweetId(tweetId) {
+  return Tweets.deleteOne({ tweetId });
+}
+
+// ambil tweets terbaru + total likes, dislikes + repost
+async function getRecentTweets() {
+  const tweets = await Tweets.find().sort({ createdAt: -1 }).limit(10);
+
+  const result = await Promise.all(
+    tweets.map(async (tweet) => {
+      const likesCount = await Likes.countDocuments({
+        tweetId: tweet.tweetId,
+      });
+
+      const dislikesCount = await Dislikes.countDocuments({
+        tweetId: tweet.tweetId,
+      });
+
+      const repostCount = await Retweets.countDocuments({
+        tweetId: tweet.tweetId,
+      });
+
+      return {
+        ...tweet.toJSON(),
+        likesCount,
+        dislikesCount,
+        repostCount,
+      };
+    })
+  );
+
+  return result;
+}
+
+// ambil semua tweet punya user tertentu
+async function getTweetsByUserId(userId) {
+  return Tweets.find({ userId });
 }
 
 module.exports = {
   createTweet,
   getTweetByTweetId,
+  deleteTweetByTweetId,
+  getRecentTweets,
+  getTweetsByUserId,
 };

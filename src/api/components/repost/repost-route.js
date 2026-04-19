@@ -13,5 +13,6 @@ module.exports = (app) => {
 
   route.delete('/:tweetId', authMiddleware, retweetsController.unrepostTweet);
 
+  // To check a tweet is reposted by who and who?
   route.get('/:tweetId', retweetsController.getRepostsOfTweet);
 };

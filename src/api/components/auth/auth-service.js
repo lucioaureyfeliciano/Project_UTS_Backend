@@ -20,6 +20,7 @@ async function checkLogin(email, password) {
 
   if (user && loginPassed) {
     return {
+      userId: user.userId,
       email: user.email,
       token: generateToken(email),
     };

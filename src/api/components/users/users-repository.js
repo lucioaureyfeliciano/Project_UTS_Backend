@@ -13,19 +13,23 @@ async function getUserByEmail(email) {
 }
 
 async function createUser(email, password, username) {
-  return Users.create({ email, password, username });
+  return Users.create({
+    email,
+    password,
+    username,
+  });
 }
 
-async function updateUser(id, email, username) {
-  return Users.updateOne({ _id: id }, { $set: { email, username } });
+async function updateUser(userId, email, username) {
+  return Users.updateOne({ userId }, { $set: { email, username } });
 }
 
-async function changePassword(id, password) {
-  return Users.updateOne({ _id: id }, { $set: { password } });
+async function changePassword(userId, password) {
+  return Users.updateOne({ userId }, { $set: { password } });
 }
 
-async function deleteUser(id) {
-  return Users.deleteOne({ _id: id });
+async function deleteUser(userId) {
+  return Users.deleteOne({ userId });
 }
 
 module.exports = {

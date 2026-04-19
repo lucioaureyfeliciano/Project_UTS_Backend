@@ -44,9 +44,9 @@ module.exports = (db) => {
   });
 
   schema.set('toJSON', {
-    transform: function (doc, ret) {
-      delete ret._id;
-      delete ret.__v;
+    transform(doc, ret) {
+      const { _id, __v, ...cleanRet } = ret;
+      return cleanRet;
     },
   });
 

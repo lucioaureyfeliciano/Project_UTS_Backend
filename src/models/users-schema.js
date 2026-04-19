@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+
 module.exports = (db) => {
   const schema = db.Schema({
     userId: {
