@@ -1,29 +1,32 @@
-const commentsRepository = require("./comments-repository");
-const notificationsRepository = require("../notifications/notifications-repository");
+const commentsRepository = require('./comments-repository');
+const notificationsRepository = require('../notifications/notifications-repository');
+
+async function createComment(tweetId, userId, content, tweetOwnerId) {
+  const comment = await commentsRepository.createComment(
+    tweetId,
+    userId,
+    content
+  );
+
+  if (tweetOwnerId && tweetOwnerId.toString() !== userId.toString()) {
+    await notificationsRepository.createNotification(
+      tweetOwnerId,
+      userId,
+      'comment',
+      tweetId
+    );
+  }
+
+  return comment;
+}
 
 async function getCommentsByTweetId(tweetId) {
   const comments = await commentsRepository.getCommentsByTweetId(tweetId);
   return { tweetId, totalComments: comments.length, comments };
 }
 
-async function createComment(tweetId, userId, content, tweetOwnerId) {
-  const comment = await commentsRepository.createComment(
-    tweetId,
-    userId,
-    content,
-  );
-
-  // kirim notifikasi ke pemilik tweet (kalau bukan diri sendiri)
-  if (tweetOwnerId && tweetOwnerId.toString() !== userId.toString()) {
-    await notificationsRepository.createNotification(
-      tweetOwnerId,
-      userId,
-      "comment",
-      tweetId,
-    );
-  }
-
-  return comment;
+async function getCommentById(id) {
+  return commentsRepository.getCommentById(id);
 }
 
 async function updateComment(id, userId, content) {
@@ -31,7 +34,7 @@ async function updateComment(id, userId, content) {
   if (!comment) return null;
 
   // hanya pemilik komentar yang boleh edit
-  if (comment.userId.id !== userId) return "forbidden";
+  if (comment.userId !== userId) return 'forbidden';
 
   return commentsRepository.updateComment(id, content);
 }
@@ -41,11 +44,12 @@ async function deleteComment(id, userId) {
   if (!comment) return null;
 
   // hanya pemilik komentar yang boleh hapus
-  if (comment.userId.id !== userId) return "forbidden";
+  if (comment.userId !== userId) return 'forbidden';
 
   await commentsRepository.deleteComment(id);
   return true;
 }
+
 async function createReply(commentId, userId, content) {
   const parentComment = await commentsRepository.getCommentById(commentId);
   if (!parentComment) return null;
@@ -54,16 +58,15 @@ async function createReply(commentId, userId, content) {
     parentComment.tweetId,
     commentId,
     userId,
-    content,
+    content
   );
 
-  // kirim notifikasi ke pemilik komentar (kalau bukan diri sendiri)
-  if (parentComment.userId.id !== userId) {
+  if (parentComment.userId !== userId) {
     await notificationsRepository.createNotification(
-      parentComment.userId.id,
+      parentComment.userId,
       userId,
-      "comment",
-      parentComment.tweetId,
+      'comment',
+      parentComment.tweetId
     );
   }
 
@@ -75,22 +78,18 @@ async function getRepliesByCommentId(commentId) {
   return { commentId, totalReplies: replies.length, replies };
 }
 
-async function getComment(id) {
-  return commentsRepository.getCommentById(id);
-}
-
 async function countCommentsByTweetId(tweetId) {
   const count = await commentsRepository.countCommentsByTweetId(tweetId);
   return { tweetId, totalComments: count };
 }
 
 module.exports = {
-  getCommentsByTweetId,
   createComment,
+  getCommentsByTweetId,
+  getCommentById,
   updateComment,
   deleteComment,
   createReply,
   getRepliesByCommentId,
-  getComment,
   countCommentsByTweetId,
 };

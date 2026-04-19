@@ -21,12 +21,14 @@ async function getTweetByTweetId(tweetId) {
   const likesCount = await Likes.countDocuments({ tweetId });
   const dislikesCount = await Dislikes.countDocuments({ tweetId });
   const repostCount = await Retweets.countDocuments({ tweetId });
+  const commentsCount = await Comments.countDocuments({ tweetId });
 
   return {
     ...tweet.toJSON(),
     likesCount,
     dislikesCount,
     repostCount,
+    commentsCount,
   };
 }
 

@@ -1,5 +1,7 @@
 const retweetsRepository = require('./repost-repository');
 const { Users } = require('../../../models');
+// untuk endpoint notifications
+const notificationsRepository = require('../notifications/notifications-repository');
 
 async function repostTweet(tweetId, userId) {
   // Cek apakah tweet asli ada
@@ -18,6 +20,17 @@ async function repostTweet(tweetId, userId) {
   }
 
   const repost = await retweetsRepository.createRepost(tweetId, userId);
+
+  // untuk endpoint notifications
+  if (tweet.userId && tweet.userId.toString() !== userId.toString()) {
+    await notificationsRepository.createNotification(
+      tweet.userId,
+      userId,
+      'repost',
+      tweetId
+    );
+  }
+
   return {
     message: 'Tweet reposted successfully',
     data: {

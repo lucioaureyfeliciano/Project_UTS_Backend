@@ -1,7 +1,6 @@
-const notificationsService = require("./notifications-service");
-const { errorResponder, errorTypes } = require("../../../core/errors");
+const notificationsService = require('./notifications-service');
+const { errorResponder, errorTypes } = require('../../../core/errors');
 
-// GET notifications
 async function getNotifications(request, response, next) {
   try {
     const filter = {
@@ -12,13 +11,13 @@ async function getNotifications(request, response, next) {
     const result = await notificationsService.getNotifications(
       request.params.id,
       request.user.userId,
-      filter,
+      filter
     );
 
-    if (result === "forbidden") {
+    if (result === 'forbidden') {
       throw errorResponder(
         errorTypes.FORBIDDEN,
-        "Anda tidak memiliki akses ke notifikasi ini",
+        'You do not have access to these notifications'
       );
     }
 
@@ -28,7 +27,6 @@ async function getNotifications(request, response, next) {
   }
 }
 
-// CREATE notification
 async function createNotification(request, response, next) {
   try {
     const { actorId, type, tweetId } = request.body;
@@ -36,16 +34,16 @@ async function createNotification(request, response, next) {
     if (!actorId || !type) {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
-        "Field actorId have to be filled and type is required",
+        'Field actorId have to be filled and type is required'
       );
     }
 
-    const validTypes = ["like", "follow", "comment", "repost"];
+    const validTypes = ['like', 'follow', 'comment', 'repost'];
 
     if (!validTypes.includes(type)) {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
-        "Type must be one of: like, follow, comment, repost",
+        'Type must be one of: like, follow, comment, repost'
       );
     }
 
@@ -53,7 +51,7 @@ async function createNotification(request, response, next) {
       request.params.id,
       actorId,
       type,
-      tweetId || null,
+      tweetId || null
     );
 
     return response.status(201).json(result);
@@ -62,24 +60,23 @@ async function createNotification(request, response, next) {
   }
 }
 
-// MARK AS READ
 async function markAsRead(request, response, next) {
   try {
     const result = await notificationsService.markAsRead(
       request.params.id,
       request.params.notif_id,
-      request.user.userId,
+      request.user.userId
     );
 
-    if (result === "forbidden") {
+    if (result === 'forbidden') {
       throw errorResponder(
         errorTypes.FORBIDDEN,
-        "You do not have access to this notification",
+        'You do not have access to this notification'
       );
     }
 
     if (result === null) {
-      throw errorResponder(errorTypes.NOT_FOUND, "Notification not found");
+      throw errorResponder(errorTypes.NOT_FOUND, 'Notification not found');
     }
 
     return response.status(200).json(result);
@@ -88,46 +85,44 @@ async function markAsRead(request, response, next) {
   }
 }
 
-// DELETE
 async function deleteNotification(request, response, next) {
   try {
     const result = await notificationsService.deleteNotification(
       request.params.id,
       request.params.notif_id,
-      request.user.userId,
+      request.user.userId
     );
 
-    if (result === "forbidden") {
+    if (result === 'forbidden') {
       throw errorResponder(
         errorTypes.FORBIDDEN,
-        "You do not have access to this notification",
+        'You do not have access to this notification'
       );
     }
 
     if (result === null) {
-      throw errorResponder(errorTypes.NOT_FOUND, "Notification not found");
+      throw errorResponder(errorTypes.NOT_FOUND, 'Notification not found');
     }
 
     return response.status(200).json({
-      message: "Notification deleted successfully",
+      message: 'Notification deleted successfully',
     });
   } catch (error) {
     return next(error);
   }
 }
 
-// GET unread count
 async function getUnreadCount(request, response, next) {
   try {
     const result = await notificationsService.getUnreadCount(
       request.params.id,
-      request.user.userId,
+      request.user.userId
     );
 
-    if (result === "forbidden") {
+    if (result === 'forbidden') {
       throw errorResponder(
         errorTypes.FORBIDDEN,
-        "You do not have access to this notification",
+        'You do not have access to this notification'
       );
     }
 
