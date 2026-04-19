@@ -1,7 +1,6 @@
 const commentsService = require('./comments-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
-// POST /tweets/:id/comments -> buat komentar (harus login)
 async function createComment(request, response, next) {
   try {
     const { content, tweetOwnerId } = request.body;
@@ -36,7 +35,6 @@ async function createComment(request, response, next) {
   }
 }
 
-// GET /tweets/:id/comments -> ambil semua komentar tweet berdasarkan id tweet
 async function getCommentsByTweetId(request, response, next) {
   try {
     const result = await commentsService.getCommentsByTweetId(
@@ -48,7 +46,6 @@ async function getCommentsByTweetId(request, response, next) {
   }
 }
 
-// GET /comments/:id -> ambil sebuah komentar berdasarkan id komentar
 async function getCommentById(request, response, next) {
   try {
     const comment = await commentsService.getCommentById(request.params.id);
@@ -61,7 +58,6 @@ async function getCommentById(request, response, next) {
   }
 }
 
-// PUT  /comments/:id -> edit komentar (harus login)
 async function updateComment(request, response, next) {
   try {
     const { content } = request.body;
@@ -106,7 +102,6 @@ async function updateComment(request, response, next) {
   }
 }
 
-// DELETE /comments/:id -> hapus komentar (harus login)
 async function deleteComment(request, response, next) {
   try {
     const userId = request.user.id;
@@ -136,7 +131,6 @@ async function deleteComment(request, response, next) {
   }
 }
 
-// POST /api/comments/:id/replies
 async function createReply(request, response, next) {
   try {
     const { content } = request.body;
@@ -165,7 +159,6 @@ async function createReply(request, response, next) {
   }
 }
 
-// GET /api/comments/:id/replies
 async function getRepliesByCommentId(request, response, next) {
   try {
     const result = await commentsService.getRepliesByCommentId(
@@ -177,7 +170,6 @@ async function getRepliesByCommentId(request, response, next) {
   }
 }
 
-// GET /api/tweets/:id/comments/count
 async function countCommentsByTweetId(request, response, next) {
   try {
     const result = await commentsService.countCommentsByTweetId(

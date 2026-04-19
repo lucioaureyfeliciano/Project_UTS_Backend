@@ -8,7 +8,6 @@ async function createComment(tweetId, userId, content, tweetOwnerId) {
     content
   );
 
-  // kirim notifikasi ke pemilik tweet (kalau bukan diri sendiri)
   if (tweetOwnerId && tweetOwnerId.toString() !== userId.toString()) {
     await notificationsRepository.createNotification(
       tweetOwnerId,
@@ -62,7 +61,6 @@ async function createReply(commentId, userId, content) {
     content
   );
 
-  // kirim notifikasi ke pemilik komentar (kalau bukan diri sendiri)
   if (parentComment.userId !== userId) {
     await notificationsRepository.createNotification(
       parentComment.userId,

@@ -6,7 +6,6 @@ async function getNotifications(userId, requesterId, filter) {
 }
 
 async function createNotification(userId, actorId, type, tweetId) {
-  // tidak kirim notif ke diri sendiri
   if (userId.toString() === actorId.toString()) return null;
   return notificationsRepository.createNotification(
     userId,

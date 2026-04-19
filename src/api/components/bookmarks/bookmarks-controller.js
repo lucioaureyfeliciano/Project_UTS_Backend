@@ -13,7 +13,6 @@ function handleForbiddenOrNotFound(result, next) {
   return null;
 }
 
-// POST /users/:id/bookmarks
 async function addBookmark(request, response, next) {
   try {
     const { tweetId } = request.body;
@@ -53,7 +52,6 @@ async function addBookmark(request, response, next) {
   }
 }
 
-// GET /api/users/:id/bookmarks/check/:tweet_id
 async function checkBookmark(request, response, next) {
   try {
     const result = await bookmarksService.checkBookmark(
@@ -69,7 +67,6 @@ async function checkBookmark(request, response, next) {
   }
 }
 
-// GET /users/:id/bookmarks
 async function getBookmarks(request, response, next) {
   try {
     const result = await bookmarksService.getBookmarks(
@@ -84,7 +81,6 @@ async function getBookmarks(request, response, next) {
   }
 }
 
-// DELETE /users/:id/bookmarks/:tweet_id
 async function removeBookmark(request, response, next) {
   try {
     const result = await bookmarksService.removeBookmark(
@@ -110,7 +106,6 @@ async function removeBookmark(request, response, next) {
   }
 }
 
-// DELETE /users/:id/bookmarks
 async function clearBookmarks(request, response, next) {
   try {
     const result = await bookmarksService.clearBookmarks(
@@ -126,7 +121,6 @@ async function clearBookmarks(request, response, next) {
   }
 }
 
-// GET /api/users/:id/bookmarks/count
 async function countBookmarks(request, response, next) {
   try {
     const result = await bookmarksService.countBookmarks(

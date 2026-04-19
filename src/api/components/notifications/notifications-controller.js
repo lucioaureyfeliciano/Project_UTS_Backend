@@ -1,7 +1,6 @@
 const notificationsService = require('./notifications-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
-// GET notifications
 async function getNotifications(request, response, next) {
   try {
     const filter = {
@@ -28,7 +27,6 @@ async function getNotifications(request, response, next) {
   }
 }
 
-// CREATE notification
 async function createNotification(request, response, next) {
   try {
     const { actorId, type, tweetId } = request.body;
@@ -62,7 +60,6 @@ async function createNotification(request, response, next) {
   }
 }
 
-// MARK AS READ
 async function markAsRead(request, response, next) {
   try {
     const result = await notificationsService.markAsRead(
@@ -88,7 +85,6 @@ async function markAsRead(request, response, next) {
   }
 }
 
-// DELETE
 async function deleteNotification(request, response, next) {
   try {
     const result = await notificationsService.deleteNotification(
@@ -116,7 +112,6 @@ async function deleteNotification(request, response, next) {
   }
 }
 
-// GET unread count
 async function getUnreadCount(request, response, next) {
   try {
     const result = await notificationsService.getUnreadCount(

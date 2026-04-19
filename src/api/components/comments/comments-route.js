@@ -18,22 +18,22 @@ module.exports = (app) => {
     commentsController.createComment
   );
 
-  // PUT  /comments/:id        -> edit komentar (harus login)
+  // PUT  /comments/:id -> edit komentar (harus login)
   route.put('/:id', authMiddleware, commentsController.updateComment);
 
-  // DELETE /comments/:id      -> hapus komentar (harus login)
+  // DELETE /comments/:id -> hapus komentar (harus login)
   route.delete('/:id', authMiddleware, commentsController.deleteComment);
 
-  // POST /comments/:id/replies-> reply komentar (harus login)
+  // POST /comments/:id/replies -> reply komentar (harus login)
   route.post('/:id/replies', authMiddleware, commentsController.createReply);
 
   // GET /comments/:id/replies -> ambil semua reply
   route.get('/:id/replies', commentsController.getRepliesByCommentId);
 
-  // GET /tweets/:id/comments  -> ambil semua komentar tweet berdasarkan id tweet
+  // GET /tweets/:id/comments -> ambil semua komentar tweet berdasarkan id tweet
   tweetRoute.get('/:id/comments', commentsController.getCommentsByTweetId);
 
-  // GET /comments/:id         -> ambil sebuah komentar berdasarkan id komentar
+  // GET /comments/:id -> ambil sebuah komentar berdasarkan id komentar
   route.get('/:id', commentsController.getCommentById);
 
   // GET /tweets/:id/comments/count -> hitung total komentar
