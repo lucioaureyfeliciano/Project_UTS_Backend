@@ -1,12 +1,14 @@
 const express = require('express');
 
 const users = require('./components/users/users-route');
-const comments = require('./components/comments/comments-route.js');
-const bookmarks = require('./components/bookmarks/bookmarks-route.js');
-const notifications = require('./components/notifications/notifications-route.js');
+const comments = require('./components/comments/comments-route');
+const bookmarks = require('./components/bookmarks/bookmarks-route');
+const notifications = require('./components/notifications/notifications-route');
 const auth = require('./components/auth/auth-route');
 const tweets = require('./components/tweets/tweets-route');
 const repost = require('./components/repost/repost-route');
+const community = require('./components/community/community-route');
+const usage = require('./components/usage/usage-route');
 const likes = require('./components/likes/likes-route');
 const follows = require('./components/follows/follows-route');
 const block = require('./components/block/block-route');
@@ -19,6 +21,8 @@ module.exports = () => {
   const app = express.Router();
 
   users(app);
+  community(app);
+  usage(app);
   comments(app);
   notifications(app);
   bookmarks(app);

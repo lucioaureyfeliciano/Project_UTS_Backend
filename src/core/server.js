@@ -8,6 +8,8 @@ const logger = require('./logger')('app');
 const routes = require('../api/routes');
 const { errorResponder, errorTypes } = require('./errors');
 
+const trackUsage = require('../api/middlewares/trackUsage.middleware');
+
 const app = express();
 
 // Useful if behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc).
@@ -28,6 +30,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Log HTTP requests with Pino
 app.use(pinoHTTP({ logger }));
+
+app.use(trackUsage);
 
 // API routes
 app.use(`${config.api.prefix}`, routes());
