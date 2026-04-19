@@ -1,11 +1,11 @@
 const communityRepository = require('./community-repository');
 
-async function getCommunity() {
-  return communityRepository.getCommunity();
+async function getAllCommunity() {
+  return communityRepository.getAllCommunity();
 }
 
-async function getCommunity(id) {
-  return communityRepository.getCommunity(id);
+async function getCommunityById(id) {
+  return communityRepository.getCommunityById(id);
 }
 
 async function getCommunityMembers(id) {
@@ -28,7 +28,7 @@ async function createCommunity(name, description, isPrivate, creatorId) {
 }
 
 async function joinCommunity(id, userId) {
-  const community = await communityRepository.getCommunity(id);
+  const community = await communityRepository.getCommunityById(id);
   if (!community) {
     return null;
   }
@@ -45,7 +45,7 @@ async function joinCommunity(id, userId) {
 }
 
 async function leaveCommunity(id, userId) {
-  const community = await communityRepository.getCommunity(id);
+  const community = await communityRepository.getCommunityById(id);
   if (!community) {
     return null;
   }
@@ -62,8 +62,8 @@ async function deleteCommunity(id) {
 }
 
 module.exports = {
-  getCommunity,
-  getCommunity,
+  getAllCommunity,
+  getCommunityById,
   getCommunityMembers,
   createCommunity,
   joinCommunity,

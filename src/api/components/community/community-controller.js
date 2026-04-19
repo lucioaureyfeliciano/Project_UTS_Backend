@@ -1,19 +1,19 @@
 const communityService = require('./community-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
-async function getCommunity(request, response, next) {
+async function getAllCommunity(request, response, next) {
   try {
-    const community = await communityService.getCommunity();
+    const community = await communityService.getAllCommunity();
     return response.status(200).json(community);
   } catch (error) {
     return next(error);
   }
 }
 
-async function getCommunity(request, response, next) {
+async function getCommunityById(request, response, next) {
   try {
     const { id } = request.params;
-    const community = await communityService.getCommunity(id);
+    const community = await communityService.getCommunityById(id);
 
     if (!community) {
       throw errorResponder(errorTypes.NOT_FOUND, 'Community not found');
@@ -158,8 +158,8 @@ async function deleteCommunity(request, response, next) {
 }
 
 module.exports = {
-  getCommunity,
-  getCommunity,
+  getAllCommunity,
+  getCommunityById,
   getCommunityMembers,
   createCommunity,
   joinCommunity,

@@ -1,10 +1,10 @@
 const { Community } = require('../../../models');
 
-async function getCommunity() {
+async function getAllCommunity() {
   return Community.find({ isPrivate: false }).sort({ createdAt: -1 });
 }
 
-async function getCommunity(id) {
+async function getCommunityById(id) {
   return Community.findById(id);
 }
 
@@ -59,8 +59,8 @@ async function deleteCommunity(id) {
 }
 
 module.exports = {
-  getCommunity,
-  getCommunity,
+  getCommunityById,
+  getAllCommunity,
   getCommunityByName,
   getCommunityMembers,
   createCommunity,
