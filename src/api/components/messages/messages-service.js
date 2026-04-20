@@ -1,9 +1,21 @@
 const messagesRepository = require('./messages-repository');
 const usersRepository = require('../users/users-repository');
+const { isBlocked } = require('../../../utils/block');
 
-async function attachUserInfo(message) {
-  const sender = await usersRepository.getUserById(message.senderId);
-  const receiver = await usersRepository.getUserById(message.receiverId);
+function createUserCache() {
+  const cache = {};
+
+  return async function getUser(userId) {
+    if (!cache[userId]) {
+      cache[userId] = await usersRepository.getUserById(userId);
+    }
+    return cache[userId];
+  };
+}
+
+async function attachUserInfo(message, getUser) {
+  const sender = await getUser(message.senderId);
+  const receiver = await getUser(message.receiverId);
 
   const { senderId, receiverId, ...rest } = message.toObject();
 
@@ -44,16 +56,27 @@ async function sendMessage(senderId, receiverId, text) {
     throw new Error('Text is required');
   }
 
+  if (await isBlocked(senderId, receiverId)) {
+    throw new Error('Cannot send message (user is blocked)');
+  }
+
   const message = await messagesRepository.createMessage({
     senderId,
     receiverId,
     text,
   });
 
-  return attachUserInfo(message);
+  const getUser = createUserCache();
+
+  return attachUserInfo(message, getUser);
 }
 
 async function getMessages(currentUserId, otherUserId) {
+  if (await isBlocked(currentUserId, otherUserId)) {
+    throw new Error('Cannot access this conversation');
+  }
+
+  // tandai sebagai read
   await messagesRepository.markAsRead(currentUserId, otherUserId);
 
   const messages = await messagesRepository.getMessages(
@@ -61,22 +84,29 @@ async function getMessages(currentUserId, otherUserId) {
     otherUserId
   );
 
-  return Promise.all(messages.map(attachUserInfo));
+  const getUser = createUserCache();
+
+  return Promise.all(messages.map((msg) => attachUserInfo(msg, getUser)));
 }
 
 async function getInbox(userId) {
   const messages = await messagesRepository.getAllUserMessages(userId);
 
   const map = {};
+  const getUser = createUserCache();
 
   for (const msg of messages) {
     const otherUserId = msg.senderId === userId ? msg.receiverId : msg.senderId;
+
+    if (await isBlocked(userId, otherUserId)) {
+      continue;
+    }
 
     if (
       !map[otherUserId] ||
       new Date(msg.createdAt) > new Date(map[otherUserId].lastMessage.createdAt)
     ) {
-      const user = await usersRepository.getUserById(otherUserId);
+      const user = await getUser(otherUserId);
 
       map[otherUserId] = {
         userId: user.userId,
@@ -86,6 +116,7 @@ async function getInbox(userId) {
       };
     }
 
+    // hitung unread
     if (msg.receiverId === userId && !msg.isRead) {
       map[otherUserId].unreadCount++;
     }
@@ -106,7 +137,9 @@ async function updateMessage(messageId, userId, text) {
     edited: true,
   });
 
-  return attachUserInfo(updated);
+  const getUser = createUserCache();
+
+  return attachUserInfo(updated, getUser);
 }
 
 async function deleteMessage(messageId, userId) {
