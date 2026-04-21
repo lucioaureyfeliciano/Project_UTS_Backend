@@ -37,8 +37,11 @@ async function createComment(request, response, next) {
 
 async function getCommentsByTweetId(request, response, next) {
   try {
+    const currentUserId = request.user?.id || null;
+
     const result = await commentsService.getCommentsByTweetId(
-      request.params.id
+      request.params.id,
+      currentUserId
     );
     return response.status(200).json(result);
   } catch (error) {
@@ -161,8 +164,11 @@ async function createReply(request, response, next) {
 
 async function getRepliesByCommentId(request, response, next) {
   try {
+    const currentUserId = request.user?.id || null;
+
     const result = await commentsService.getRepliesByCommentId(
-      request.params.id
+      request.params.id,
+      currentUserId
     );
     return response.status(200).json(result);
   } catch (error) {
