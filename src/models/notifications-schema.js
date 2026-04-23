@@ -19,7 +19,7 @@ module.exports = (db) => {
 
     type: {
       type: String,
-      enum: ['like', 'comment', 'follow', 'repost'],
+      enum: ['like', 'comment', 'follow', 'repost', 'message'],
       required: true,
     },
 
