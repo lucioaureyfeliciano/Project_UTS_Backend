@@ -6,9 +6,7 @@ async function getNotifications(userId, filter) {
   if (filter.type) query.type = filter.type;
   if (filter.status === 'unread') query.isRead = false;
 
-  return Notifications.find(query)
-    .populate('actorId', 'username')
-    .sort({ createdAt: -1 });
+  return Notifications.find(query).sort({ createdAt: -1 });
 }
 
 async function createNotification(userId, actorId, type, tweetId) {

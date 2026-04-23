@@ -1,11 +1,13 @@
 const { Mutes } = require('../../../models');
 
 async function addMute(userId, mutedId) {
-  return Mutes.findOneAndUpdate(
-    { userId, mutedId },
-    { userId, mutedId },
-    { upsert: true, new: true }
-  );
+  const existing = await Mutes.findOne({ userId, mutedId });
+
+  if (existing) {
+    return existing;
+  }
+
+  return Mutes.create({ userId, mutedId });
 }
 
 async function removeMute(userId, mutedId) {
