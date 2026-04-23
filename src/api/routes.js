@@ -16,6 +16,7 @@ const mute = require('./components/mute/mute-route');
 const messages = require('./components/messages/messages-route');
 const dislikes = require('./components/dislikes/dislikes-route');
 const trending = require('./components/trending/trending-route');
+const timelines = require('./components/timelines/timeline-route');
 const profiles = require('./components/profiles/profiles-route');
 
 module.exports = () => {
@@ -37,6 +38,7 @@ module.exports = () => {
   follows(app);
   block(app);
   mute(app);
+  timelines(app);
   profiles(app);
 
   return app;
