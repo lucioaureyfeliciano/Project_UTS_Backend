@@ -1,6 +1,19 @@
 const dislikesService = require('./dislikes-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
+function mapErrorType(error) {
+  switch (error) {
+    case 'NOT_FOUND':
+      return errorTypes.DATA_NOT_FOUND;
+    case 'CONFLICT':
+      return errorTypes.CONFLICT;
+    case 'FORBIDDEN':
+      return errorTypes.FORBIDDEN;
+    default:
+      return errorTypes.UNKNOWN_ERROR;
+  }
+}
+
 async function dislikeTweet(request, response, next) {
   try {
     const { tweetId } = request.params;
@@ -13,7 +26,7 @@ async function dislikeTweet(request, response, next) {
     const result = await dislikesService.dislikeTweet(tweetId, user.userId);
 
     if (result.error) {
-      throw errorResponder(errorTypes.CONFLICT, result.message);
+      throw errorResponder(mapErrorType(result.error), result.message);
     }
 
     return response.status(201).json(result);
@@ -27,10 +40,14 @@ async function undislikeTweet(request, response, next) {
     const { tweetId } = request.params;
     const { user } = request;
 
+    if (!user || !user.userId) {
+      throw errorResponder(errorTypes.UNAUTHORIZED, 'User not authenticated');
+    }
+
     const result = await dislikesService.undislikeTweet(tweetId, user.userId);
 
     if (result.error) {
-      throw errorResponder(errorTypes.DATA_NOT_FOUND, result.message);
+      throw errorResponder(mapErrorType(result.error), result.message);
     }
 
     return response.status(200).json(result);
@@ -42,8 +59,20 @@ async function undislikeTweet(request, response, next) {
 async function getUsersWhoDisliked(request, response, next) {
   try {
     const { tweetId } = request.params;
+    const { user } = request;
 
-    const result = await dislikesService.getUsersWhoDisliked(tweetId);
+    if (!user || !user.userId) {
+      throw errorResponder(errorTypes.UNAUTHORIZED, 'User not authenticated');
+    }
+
+    const result = await dislikesService.getUsersWhoDisliked(
+      tweetId,
+      user.userId // 👈 penting untuk block check
+    );
+
+    if (result.error) {
+      throw errorResponder(mapErrorType(result.error), result.message);
+    }
 
     return response.status(200).json(result);
   } catch (error) {
@@ -54,6 +83,16 @@ async function getUsersWhoDisliked(request, response, next) {
 async function getDislikedTweetsByUser(request, response, next) {
   try {
     const { userId } = request.params;
+    const { user } = request;
+
+    if (!user || !user.userId) {
+      throw errorResponder(errorTypes.UNAUTHORIZED, 'User not authenticated');
+    }
+
+    // optional security: hanya boleh lihat milik sendiri
+    if (user.userId !== userId) {
+      throw errorResponder(errorTypes.FORBIDDEN, 'Forbidden');
+    }
 
     const result = await dislikesService.getDislikedTweetsByUser(userId);
 

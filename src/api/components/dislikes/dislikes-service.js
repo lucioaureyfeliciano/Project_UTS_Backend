@@ -1,10 +1,18 @@
 const dislikesRepository = require('./dislikes-repository');
 const { Users, Tweets } = require('../../../models');
+const { isBlocked } = require('../../../utils/block');
 
 async function dislikeTweet(tweetId, userId) {
   const tweet = await dislikesRepository.findTweetByTweetId(tweetId);
   if (!tweet) {
     return { error: 'NOT_FOUND', message: 'Tweet not found' };
+  }
+
+  if (await isBlocked(userId, tweet.userId)) {
+    return {
+      error: 'FORBIDDEN',
+      message: 'Cannot interact with this tweet',
+    };
   }
 
   const existing = await dislikesRepository.findDislike(tweetId, userId);
@@ -35,6 +43,13 @@ async function undislikeTweet(tweetId, userId) {
     return { error: 'NOT_FOUND', message: 'Tweet not found' };
   }
 
+  if (await isBlocked(userId, tweet.userId)) {
+    return {
+      error: 'FORBIDDEN',
+      message: 'Cannot interact with this tweet',
+    };
+  }
+
   const existing = await dislikesRepository.findDislike(tweetId, userId);
   if (!existing) {
     return { error: 'NOT_FOUND', message: 'Dislike not found' };
@@ -54,10 +69,17 @@ async function undislikeTweet(tweetId, userId) {
   };
 }
 
-async function getUsersWhoDisliked(tweetId) {
+async function getUsersWhoDisliked(tweetId, currentUserId) {
   const tweet = await dislikesRepository.findTweetByTweetId(tweetId);
   if (!tweet) {
     return { error: 'NOT_FOUND', message: 'Tweet not found' };
+  }
+
+  if (await isBlocked(currentUserId, tweet.userId)) {
+    return {
+      error: 'FORBIDDEN',
+      message: 'Cannot access this tweet',
+    };
   }
 
   const dislikes = await dislikesRepository.getDislikesByTweetId(tweetId);
