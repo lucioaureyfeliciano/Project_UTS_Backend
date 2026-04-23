@@ -1,12 +1,23 @@
 const commentsRepository = require('./comments-repository');
+const notificationsService = require('../notifications/notifications-service');
 const notificationsRepository = require('../notifications/notifications-repository');
+const tweetsRepository = require('../tweets/tweets-repository');
 const { isBlocked } = require('../../../utils/block');
 const { isMuted } = require('../../../utils/mute');
 
-async function createComment(tweetId, userId, content, tweetOwnerId) {
-  if (tweetOwnerId) {
-    if (await isBlocked(tweetOwnerId, userId)) {
-      return null;
+async function createComment(tweetId, userId, content) {
+  const tweet = await tweetsRepository.getTweetByTweetId(tweetId);
+  if (!tweet || tweet.error) return null;
+
+  const tweetOwnerId = tweet.userId;
+
+  if (await isBlocked(tweetOwnerId, userId)) {
+    return null;
+  }
+
+  if (tweetOwnerId !== userId) {
+    if (await isMuted(tweetOwnerId, userId)) {
+      throw new Error('Cannot send message (user is muted)');
     }
   }
 
@@ -16,18 +27,13 @@ async function createComment(tweetId, userId, content, tweetOwnerId) {
     content
   );
 
-  if (tweetOwnerId && tweetOwnerId !== userId) {
-    const blocked = await isBlocked(tweetOwnerId, userId);
-    const muted = await isMuted(tweetOwnerId, userId);
-
-    if (!blocked && !muted) {
-      await notificationsRepository.createNotification(
-        tweetOwnerId,
-        userId,
-        'comment',
-        tweetId
-      );
-    }
+  if (tweetOwnerId !== userId) {
+    await notificationsService.createNotification(
+      tweetOwnerId,
+      userId,
+      'comment',
+      tweetId
+    );
   }
 
   return comment;
@@ -44,7 +50,6 @@ async function getCommentsByTweetId(tweetId, currentUserId = null) {
     comments.map(async (comment) => {
       const commentUserId = comment.userId?.id || comment.userId;
       if (await isBlocked(currentUserId, commentUserId)) return null;
-      if (await isMuted(currentUserId, commentUserId)) return null;
       return comment;
     })
   );
@@ -119,7 +124,7 @@ async function getRepliesByCommentId(commentId, currentUserId = null) {
     replies.map(async (reply) => {
       const replyUserId = reply.userId?.id || reply.userId;
       if (await isBlocked(currentUserId, replyUserId)) return null;
-      if (await isMuted(currentUserId, replyUserId)) return null;
+
       return reply;
     })
   );

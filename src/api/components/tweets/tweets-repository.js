@@ -1,4 +1,10 @@
-const { Tweets, Likes, Retweets, Dislikes } = require('../../../models');
+const {
+  Tweets,
+  Likes,
+  Retweets,
+  Dislikes,
+  Comments,
+} = require('../../../models');
 
 async function createTweet(userId, username, text) {
   return Tweets.create({

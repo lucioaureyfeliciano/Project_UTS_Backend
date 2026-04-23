@@ -12,8 +12,9 @@ async function getNotifications(userId, requesterId, filter) {
 
   const filtered = await Promise.all(
     notifications.map(async (notif) => {
-      const actorId = notif.actorId?.id || notif.actorId;
-      if (!actorId) return notif;
+      if (String(notif.userId) !== String(userId)) return null;
+
+      const actorId = notif.actorId?._id || notif.actorId;
 
       if (await isBlocked(userId, actorId)) return null;
       if (await isMuted(userId, actorId)) return null;

@@ -3,8 +3,8 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
 
 async function createComment(request, response, next) {
   try {
-    const { content, tweetOwnerId } = request.body;
-    const userId = request.user.id;
+    const { content } = request.body;
+    const { userId } = request.user;
 
     if (!content) {
       throw errorResponder(
@@ -16,8 +16,7 @@ async function createComment(request, response, next) {
     const comment = await commentsService.createComment(
       request.params.id,
       userId,
-      content,
-      tweetOwnerId
+      content
     );
 
     if (!comment) {
@@ -37,7 +36,7 @@ async function createComment(request, response, next) {
 
 async function getCommentsByTweetId(request, response, next) {
   try {
-    const currentUserId = request.user?.id || null;
+    const currentUserId = request.user?.userId || null;
 
     const result = await commentsService.getCommentsByTweetId(
       request.params.id,
@@ -64,7 +63,7 @@ async function getCommentById(request, response, next) {
 async function updateComment(request, response, next) {
   try {
     const { content } = request.body;
-    const userId = request.user.id;
+    const { userId } = request.user;
 
     const comment = await commentsService.getComment(request.params.id);
     if (!comment) {
@@ -107,7 +106,7 @@ async function updateComment(request, response, next) {
 
 async function deleteComment(request, response, next) {
   try {
-    const userId = request.user.id;
+    const { userId } = request.user;
     const result = await commentsService.deleteComment(
       request.params.id,
       userId
@@ -137,7 +136,7 @@ async function deleteComment(request, response, next) {
 async function createReply(request, response, next) {
   try {
     const { content } = request.body;
-    const userId = request.user.id;
+    const { userId } = request.user;
 
     if (!content) {
       throw errorResponder(
@@ -164,7 +163,7 @@ async function createReply(request, response, next) {
 
 async function getRepliesByCommentId(request, response, next) {
   try {
-    const currentUserId = request.user?.id || null;
+    const currentUserId = request.user?.userId || null;
 
     const result = await commentsService.getRepliesByCommentId(
       request.params.id,
