@@ -1,5 +1,6 @@
 const likesRepository = require('./likes-repository');
 const { Users, Tweets } = require('../../../models');
+const blockService = require('../block/block-service');
 // untuk endpoint notifications
 const notificationsRepository = require('../notifications/notifications-repository');
 
@@ -7,6 +8,17 @@ async function likeTweet(tweetId, userId) {
   const tweet = await likesRepository.findTweetByTweetId(tweetId);
   if (!tweet) {
     return { error: 'NOT_FOUND', message: 'Tweet not found' };
+  }
+
+  // Ini untuk ngecek apakah user nya di block atau tidak
+  const blocked = await blockService.cannotInteract(userId, tweet.userId);
+
+  if (blocked) {
+    return {
+      error: 'FORBIDDEN',
+      message:
+        'You cannot like this tweet, you might either blocked/get blocked',
+    };
   }
 
   const existing = await likesRepository.findLike(tweetId, userId);

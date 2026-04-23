@@ -12,6 +12,10 @@ async function likeTweet(request, response, next) {
 
     const result = await likesService.likeTweet(tweetId, user.userId);
 
+    if (result.error === 'FORBIDDEN') {
+      throw errorResponder(errorTypes.FORBIDDEN, result.message);
+    }
+
     if (result.error) {
       throw errorResponder(errorTypes.CONFLICT, result.message);
     }

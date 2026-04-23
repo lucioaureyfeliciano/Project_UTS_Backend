@@ -20,10 +20,18 @@ async function countBlockedUsersByUserId(userId) {
   return blockRepository.countBlockedUsersByUserId(userId);
 }
 
+async function cannotInteract(userId, targetUserId) {
+  const block1 = await blockRepository.isBlocked(userId, targetUserId);
+  const block2 = await blockRepository.isBlocked(targetUserId, userId);
+
+  return !!(block1 || block2);
+}
+
 module.exports = {
   addBlock,
   removeBlock,
   getBlockListByUserId,
   isBlocked,
   countBlockedUsersByUserId,
+  cannotInteract,
 };
