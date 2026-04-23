@@ -24,6 +24,10 @@ async function followUser(request, response, next) {
       throw errorResponder(errorTypes.VALIDATION_ERROR, result.message);
     }
 
+    if (result.error === 'FORBIDDEN') {
+      throw errorResponder(errorTypes.FORBIDDEN, result.message);
+    }
+
     return response.status(201).json(result);
   } catch (error) {
     return next(error);

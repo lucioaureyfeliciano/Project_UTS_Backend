@@ -1,5 +1,6 @@
 const followsRepository = require('./follows-repository');
 const { Users } = require('../../../models');
+const blockService = require('../block/block-service');
 // untuk endpoint notifications
 const notificationsRepository = require('../notifications/notifications-repository');
 
@@ -8,6 +9,19 @@ async function followUser(targetUserId, currentUserId) {
     return {
       error: 'VALIDATION',
       message: 'You cannot follow yourself, follow others.',
+    };
+  }
+
+  // Cek apakah user dapat mengikuti sebuah user.
+  const blocked = await blockService.cannotInteract(
+    currentUserId,
+    targetUserId
+  );
+
+  if (blocked) {
+    return {
+      error: 'FORBIDDEN',
+      message: 'You cannot follow this user',
     };
   }
 
