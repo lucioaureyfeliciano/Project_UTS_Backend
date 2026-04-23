@@ -1,5 +1,7 @@
 const messagesRepository = require('./messages-repository');
 const usersRepository = require('../users/users-repository');
+const notificationsService = require('../notifications/notifications-service');
+const { isMuted } = require('../../../utils/mute');
 const { isBlocked } = require('../../../utils/block');
 
 function createUserCache() {
@@ -65,6 +67,16 @@ async function sendMessage(senderId, receiverId, text) {
     receiverId,
     text,
   });
+
+  const isMutedCheck = await isMuted(receiverId, senderId);
+  if (!isMutedCheck) {
+    await notificationsService.createNotification(
+      receiverId,
+      senderId,
+      'message',
+      null
+    );
+  }
 
   const getUser = createUserCache();
 

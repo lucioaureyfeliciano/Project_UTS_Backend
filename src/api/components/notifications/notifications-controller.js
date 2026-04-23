@@ -38,12 +38,12 @@ async function createNotification(request, response, next) {
       );
     }
 
-    const validTypes = ['like', 'follow', 'comment', 'repost'];
+    const validTypes = ['like', 'follow', 'comment', 'repost', 'message'];
 
     if (!validTypes.includes(type)) {
       throw errorResponder(
         errorTypes.VALIDATION_ERROR,
-        'Type must be one of: like, follow, comment, repost'
+        'Type must be one of: like, follow, comment, repost, message'
       );
     }
 

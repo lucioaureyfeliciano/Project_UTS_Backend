@@ -15,19 +15,19 @@ async function createComment(tweetId, userId, content) {
     return null;
   }
 
-  if (tweetOwnerId !== userId) {
-    if (await isMuted(tweetOwnerId, userId)) {
-      throw new Error('Cannot send message (user is muted)');
-    }
-  }
+  // cek mute dulu
+  const isMutedUser =
+    tweetOwnerId !== userId && (await isMuted(tweetOwnerId, userId));
 
+  // tetap buat comment
   const comment = await commentsRepository.createComment(
     tweetId,
     userId,
     content
   );
 
-  if (tweetOwnerId !== userId) {
+  // hanya kirim notif kalau tidak di-mute
+  if (tweetOwnerId !== userId && !isMutedUser) {
     await notificationsService.createNotification(
       tweetOwnerId,
       userId,
