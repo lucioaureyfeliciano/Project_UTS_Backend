@@ -6,6 +6,7 @@ const dislikesRepository = require('../dislikes/dislikes-repository');
 const repostsRepository = require('../repost/repost-repository');
 const commentsRepository = require('../comments/comments-repository');
 const { isBlocked } = require('../../../utils/block');
+const { isMuted } = require('../../../utils/mute');
 
 // cache user biar ga N+1 parah
 function createUserCache() {
@@ -54,6 +55,10 @@ async function getTimeline(userId) {
 
   for (const tweet of tweets) {
     if (await isBlocked(userId, tweet.userId)) {
+      continue;
+    }
+
+    if (await isMuted(userId, tweet.userId)) {
       continue;
     }
 
