@@ -34,7 +34,7 @@ async function createNotification(userId, actorId, type, tweetId) {
   }
 
   if (await isMuted(userId, actorId)) {
-    return null;
+    throw new Error('Cannot create notification (user is muted)');
   }
 
   return notificationsRepository.createNotification(
