@@ -1,11 +1,6 @@
-const {
-  Tweets,
-  Likes,
-  Retweets,
-  Dislikes,
-  Comments,
-} = require('../../../models');
+const { Tweets } = require('../../../models');
 
+// create
 async function createTweet(userId, username, text) {
   return Tweets.create({
     userId,
@@ -14,68 +9,24 @@ async function createTweet(userId, username, text) {
   });
 }
 
+// get by id
 async function getTweetByTweetId(tweetId) {
-  const tweet = await Tweets.findOne({ tweetId });
-
-  if (!tweet) {
-    return {
-      error: 'NOT_FOUND',
-      message: 'Tweet not found',
-    };
-  }
-
-  const likesCount = await Likes.countDocuments({ tweetId });
-  const dislikesCount = await Dislikes.countDocuments({ tweetId });
-  const repostCount = await Retweets.countDocuments({ tweetId });
-  const commentsCount = await Comments.countDocuments({ tweetId });
-
-  return {
-    ...tweet.toJSON(),
-    likesCount,
-    dislikesCount,
-    repostCount,
-    commentsCount,
-  };
+  return Tweets.findOne({ tweetId });
 }
 
-// hapus tweets tertentu
+// delete
 async function deleteTweetByTweetId(tweetId) {
   return Tweets.deleteOne({ tweetId });
 }
 
-// ambil tweets terbaru + total likes, dislikes + repost
+// recent tweets
 async function getRecentTweets() {
-  const tweets = await Tweets.find().sort({ createdAt: -1 }).limit(10);
-
-  const result = await Promise.all(
-    tweets.map(async (tweet) => {
-      const likesCount = await Likes.countDocuments({
-        tweetId: tweet.tweetId,
-      });
-
-      const dislikesCount = await Dislikes.countDocuments({
-        tweetId: tweet.tweetId,
-      });
-
-      const repostCount = await Retweets.countDocuments({
-        tweetId: tweet.tweetId,
-      });
-
-      return {
-        ...tweet.toJSON(),
-        likesCount,
-        dislikesCount,
-        repostCount,
-      };
-    })
-  );
-
-  return result;
+  return Tweets.find().sort({ createdAt: -1 }).limit(10);
 }
 
-// ambil semua tweet punya user tertentu
+// by user
 async function getTweetsByUserId(userId) {
-  return Tweets.find({ userId });
+  return Tweets.find({ userId }).sort({ createdAt: -1 });
 }
 
 module.exports = {

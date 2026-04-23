@@ -18,6 +18,9 @@ async function repostTweet(request, response, next) {
     if (result.error === 'CONFLICT') {
       throw errorResponder(errorTypes.EMAIL_ALREADY_TAKEN, result.message);
     }
+    if (result.error === 'FORBIDDEN') {
+      throw errorResponder(errorTypes.FORBIDDEN, result.message);
+    }
 
     return response.status(201).json(result);
   } catch (error) {

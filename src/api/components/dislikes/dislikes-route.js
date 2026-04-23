@@ -14,8 +14,16 @@ module.exports = (app) => {
   route.delete('/:tweetId', authMiddleware, dislikesController.undislikeTweet);
 
   // Get users who disliked a tweet
-  route.get('/tweets/:tweetId', dislikesController.getUsersWhoDisliked);
+  route.get(
+    '/tweets/:tweetId',
+    authMiddleware,
+    dislikesController.getUsersWhoDisliked
+  );
 
   // Get tweets disliked by user
-  route.get('/users/:userId', dislikesController.getDislikedTweetsByUser);
+  route.get(
+    '/users/:userId',
+    authMiddleware,
+    dislikesController.getDislikedTweetsByUser
+  );
 };
