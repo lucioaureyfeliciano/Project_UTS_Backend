@@ -25,10 +25,15 @@ async function findTweetByTweetId(tweetId) {
   return Tweets.findOne({ tweetId });
 }
 
+async function countRepostsByTweetId(tweetId) {
+  return Retweets.countDocuments({ tweetId });
+}
+
 module.exports = {
   findRepost,
   createRepost,
   deleteRepost,
   getRepostsByTweetId,
   findTweetByTweetId,
+  countRepostsByTweetId,
 };
