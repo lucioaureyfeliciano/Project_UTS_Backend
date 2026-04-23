@@ -22,6 +22,10 @@ async function getFollowersByUserId(userId) {
   return Follows.find({ followingId: userId });
 }
 
+async function getFollowingByUserId(userId) {
+  return Follows.find({ followerId: userId }).select('followingId');
+}
+
 async function getUserByUserId(userId) {
   return Users.findOne({ userId });
 }
@@ -32,4 +36,5 @@ module.exports = {
   deleteFollow,
   getFollowersByUserId,
   getUserByUserId,
+  getFollowingByUserId,
 };

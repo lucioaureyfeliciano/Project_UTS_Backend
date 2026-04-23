@@ -2,6 +2,9 @@ const timelineRepository = require('./timeline-repository');
 const usersRepository = require('../users/users-repository');
 const followsRepository = require('../follows/follows-repository');
 const likesRepository = require('../likes/likes-repository');
+const dislikesRepository = require('../dislikes/dislikes-repository');
+const repostsRepository = require('../repost/repost-repository');
+const commentsRepository = require('../comments/comments-repository');
 const { isBlocked } = require('../../../utils/block');
 
 // cache user biar ga N+1 parah
@@ -20,7 +23,13 @@ function createUserCache() {
 async function attachUserInfo(tweet, getUser) {
   const user = await getUser(tweet.userId);
 
-  const { userId, ...rest } = tweet.toObject ? tweet.toObject() : tweet;
+  const [likesCount, dislikesCount, repostCount, commentsCount] =
+    await Promise.all([
+      likesRepository.countLikesByTweetId(tweet.tweetId),
+      dislikesRepository.countDislikesByTweetId(tweet.tweetId),
+      repostsRepository.countRepostsByTweetId(tweet.tweetId),
+      commentsRepository.countCommentsByTweetId(tweet.tweetId),
+    ]);
 
   return {
     tweetId: tweet.tweetId,
@@ -30,11 +39,10 @@ async function attachUserInfo(tweet, getUser) {
       userId: user.userId,
       username: user.username,
     },
-    likesCount: tweet.likesCount || 0,
-    dislikesCount: tweet.dislikesCount || 0,
-    repostCount: tweet.repostCount || 0,
-    commentsCount: tweet.commentsCount || 0,
-    ...rest,
+    likesCount,
+    dislikesCount,
+    repostCount,
+    commentsCount,
   };
 }
 
@@ -60,7 +68,8 @@ async function getTimeline(userId) {
 }
 
 async function getFollowingTimeline(userId) {
-  const followingIds = await followsRepository.getFollowingIds(userId);
+  const follows = await followsRepository.getFollowingByUserId(userId);
+  const followingIds = follows.map((f) => f.followingId);
 
   const tweets = await timelineRepository.getTweetsByUserIds(followingIds);
 

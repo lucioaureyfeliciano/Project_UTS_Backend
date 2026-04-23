@@ -1,5 +1,7 @@
 const retweetsRepository = require('./repost-repository');
 const { Users } = require('../../../models');
+const blockService = require('../block/block-service');
+
 // untuk endpoint notifications
 const notificationsRepository = require('../notifications/notifications-repository');
 
@@ -8,6 +10,17 @@ async function repostTweet(tweetId, userId) {
   const tweet = await retweetsRepository.findTweetByTweetId(tweetId);
   if (!tweet) {
     return { error: 'NOT_FOUND', message: 'Tweet not found' };
+  }
+
+  // Cek apakah user dapat merepost this tweet.
+  const blocked = await blockService.cannotInteract(userId, tweet.userId);
+
+  if (blocked) {
+    return {
+      error: 'FORBIDDEN',
+      message:
+        'You cannot repost this tweet, you might either blocked/get blocked',
+    };
   }
 
   // Cek apakah sudah pernah repost
