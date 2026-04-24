@@ -34,7 +34,7 @@ _Berikut adalah list of features & Endpoints yang dimiliki di project ini_
 
 ---
 
-### 👤 Users
+### Users
 
 | Method | Endpoint                             | Auth  | Deskripsi         |
 | ------ | ------------------------------------ | ----- | ----------------- |
