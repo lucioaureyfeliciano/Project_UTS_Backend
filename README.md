@@ -331,7 +331,7 @@ Berikut adalah contoh penggunaan dalam mencoba API ini
 
 ### Creators
 
-## **Kelompok 5 (Class B):**
+## **Kelompok 9 (Class B):**
 
 ---
 
