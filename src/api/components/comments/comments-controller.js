@@ -65,7 +65,7 @@ async function updateComment(request, response, next) {
     const { content } = request.body;
     const { userId } = request.user;
 
-    const comment = await commentsService.getComment(request.params.id);
+    const comment = await commentsService.getCommentById(request.params.id);
     if (!comment) {
       throw errorResponder(
         errorTypes.UNPROCESSABLE_ENTITY,
