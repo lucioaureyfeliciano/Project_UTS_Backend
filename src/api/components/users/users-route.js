@@ -1,5 +1,6 @@
 const express = require('express');
 const usersController = require('./users-controller');
+const { authMiddleware } = require('../../middlewares');
 
 const route = express.Router();
 
@@ -16,11 +17,15 @@ module.exports = (app) => {
   route.get('/:userId', usersController.getUser);
 
   // Update user
-  route.put('/:userId', usersController.updateUser);
+  route.put('/:userId', authMiddleware, usersController.updateUser);
 
   // Change password
-  route.put('/:userId/change-password', usersController.changePassword);
+  route.put(
+    '/:userId/change-password',
+    authMiddleware,
+    usersController.changePassword
+  );
 
   // Delete user
-  route.delete('/:userId', usersController.deleteUser);
+  route.delete('/:userId', authMiddleware, usersController.deleteUser);
 };

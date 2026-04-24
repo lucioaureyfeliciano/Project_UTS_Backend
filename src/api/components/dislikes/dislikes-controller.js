@@ -67,7 +67,7 @@ async function getUsersWhoDisliked(request, response, next) {
 
     const result = await dislikesService.getUsersWhoDisliked(
       tweetId,
-      user.userId // 👈 penting untuk block check
+      user.userId
     );
 
     if (result.error) {
@@ -89,7 +89,6 @@ async function getDislikedTweetsByUser(request, response, next) {
       throw errorResponder(errorTypes.UNAUTHORIZED, 'User not authenticated');
     }
 
-    // optional security: hanya boleh lihat milik sendiri
     if (user.userId !== userId) {
       throw errorResponder(errorTypes.FORBIDDEN, 'Forbidden');
     }

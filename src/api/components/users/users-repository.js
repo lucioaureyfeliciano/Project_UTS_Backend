@@ -1,10 +1,10 @@
 const { Users } = require('../../../models');
 
 async function getUsers() {
-  return Users.find({});
+  return Users.find({}, '-password');
 }
 
-async function getUserById(userId) {
+async function getUser(userId) {
   return Users.findOne({ userId });
 }
 
@@ -34,7 +34,7 @@ async function deleteUser(userId) {
 
 module.exports = {
   getUsers,
-  getUserById,
+  getUser,
   getUserByEmail,
   createUser,
   updateUser,
