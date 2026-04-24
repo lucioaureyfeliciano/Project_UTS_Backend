@@ -323,8 +323,26 @@ Berikut adalah contoh penggunaan dalam mencoba API ini
 
 1. **Buat akun** → `POST /api/users`
 2. **Login** → `POST /api/auth/login` → copy token yang didapat
-3. **Buat tweet** → `POST /api/tweets` (pakai token)
-4. **Like tweet** → `POST /api/likes/:tweetId` (pakai token)
-5. **Komen tweet** → `POST /api/tweets/:id/comments` (pakai token)
-6. **Follow user lain** → `POST /api/follows/:userId` (pakai token)
-7. **Cek notifikasi** → `GET /api/users/:id/notifications` (pakai token)
+3. **Buat tweet** → `POST /api/tweets` (token required)
+4. **Like tweet** → `POST /api/likes/:tweetId` (token required)
+5. **Komen tweet** → `POST /api/tweets/:id/comments` (token required)
+6. **Follow user lain** → `POST /api/follows/:userId` (token required)
+7. **Cek notifikasi** → `GET /api/users/:id/notifications` (token required)
+
+### Creators
+
+## **Kelompok 5 (Class B):**
+
+---
+
+| Name                    | NIM       | Github Profiles     |
+| ----------------------- | --------- | ------------------- |
+| Sherly Tamara           | 535250068 | SherlyTamaraa       |
+| Lucio Aurey Feliciano   | 535250085 | lucioaureyfeliciano |
+| Claudia Linetta Widjaja | 535250098 | claudialinetta      |
+| Neizar Apriansyah       | 535250101 | neizarapriansyah    |
+| FAKHZUL RAFLI S         | 535250102 | fakhzulraflis       |
+
+---
+
+**This API project was developed all together by the people above**
