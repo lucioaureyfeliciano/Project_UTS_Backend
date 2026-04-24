@@ -313,9 +313,24 @@ _Berikut adalah list of features & Endpoints yang dimiliki di project ini_
 | GET    | `/api/usage`         | Tidak | Lihat semua log request API             |
 | GET    | `/api/usage/summary` | Tidak | Lihat ringkasan penggunaan per endpoint |
 
-**Catatan** Filter log bisa pakai query param: `/usage?method=POST&endpoint=/api/tweets&page=1&limit=50`
+## **Catatan** Filter log bisa pakai query param: `/usage?method=POST&endpoint=/api/tweets&page=1&limit=50`
 
----
+## Privacy & Security Rules
+
+Beberapa aturan privasi yang diterapkan di aplikasi ini:
+
+### Interaksi yang Diblokir
+
+Jika kamu mem-block seorang user, maka user tersebut tidak dapat melakukan hal berikut terhadap kamu:
+
+- Like tweet kamu
+- Repost tweet kamu
+- Follow kamu
+
+Selain itu, user yang kamu block juga tidak bisa melihat:
+
+- Tweet-tweet kamu
+- Profil kamu
 
 ## Contoh Flow Penggunaan
 
